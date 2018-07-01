@@ -8,4 +8,5 @@ let rec range = (start: int, end_: int) =>
 let filter = (~f, arr) =>
   arr |> ArrayLabels.to_list |> ListLabels.filter(~f) |> ArrayLabels.of_list;
 
-let find = (~f, arr) => arr |> ArrayLabels.to_list |> ListLabels.find(~f);
+let find = (~f, arr) => 
+  arr |> ArrayLabels.to_list |> ListLabels.find(~f);

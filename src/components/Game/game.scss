@@ -15,6 +15,16 @@
     }
     .menu {
       grid-area: m;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-direction: column;
+      flex-direction: column;
+      .word {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: center;
+      }
     }
     .content {
       grid-area: c;
@@ -38,7 +48,8 @@
     .row {
       flex: 1;
       flex-direction: column;
-      justify-content: center;
+      justify-content: flex-end;
+      justify-items: flex-end;
       .spriteGrid {
         display: grid;
         grid-template-columns: repeat(12, 1fr);

@@ -14,7 +14,7 @@ let make = (~startTime, ~deathTime, ~time, ~lane, ~status, _children) => {
     if (status === Dying) {
       Js.log(deathTime);
       timeString := string_of_int(deathTime * 2) ++ "px";
-      ();
+      ignore();
     };
 
     <div
@@ -25,7 +25,7 @@ let make = (~startTime, ~deathTime, ~time, ~lane, ~status, _children) => {
         ReactDOMRe.Style.make(
           ~top=positionFromTop,
           ~transform={j|translateX($timeString)|j},
-          (),
+          ignore()
         )
       )
     />;

@@ -54,7 +54,7 @@ let make = (~number, _children) => {
           ReasonReact.arrayToElement(
             Array.of_list(
               List.map(
-                i => <div className=(Cn.make(["cell", wrapRowClass(i)])) />,
+                i => <div key={j|row-$i|j} className=(Cn.make(["cell", wrapRowClass(i)])) />,
                 cells,
               ),
             ),

@@ -13,7 +13,16 @@
     .world .layout .header {
       grid-area: h; }
     .world .layout .menu {
-      grid-area: m; }
+      grid-area: m;
+      display: -ms-flexbox;
+      display: flex;
+      -ms-flex-direction: column;
+      flex-direction: column; }
+      .world .layout .menu .word {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        justify-content: center; }
     .world .layout .content {
       grid-area: c;
       display: flex;
@@ -33,7 +42,8 @@
     .world .layout .row {
       flex: 1;
       flex-direction: column;
-      justify-content: center; }
+      justify-content: flex-end;
+      justify-items: flex-end; }
       .world .layout .row .spriteGrid {
         display: grid;
         grid-template-columns: repeat(12, 1fr); }

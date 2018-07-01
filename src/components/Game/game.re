@@ -24,7 +24,8 @@ type state = {
 type action =
   | Tick
   | SpawnSkeleton(int, lane)
-  | KillSkeleton(int, lane);
+  | KillSkeleton(int, lane)
+  | RemoveSkeleton(lane);
 
 type gameState =
   | Menu
@@ -85,7 +86,7 @@ let make = _children => {
               } else {
                 let lastArrayIndex = Array.length(state.skeletons) - 1;
                 if (state.time
-                    - state.skeletons[lastArrayIndex].startTime === 200) {
+                    - state.skeletons[lastArrayIndex].startTime === 50) {
                   self.send(SpawnSkeleton(state.time, Middle));
                 };
               }
@@ -104,34 +105,29 @@ let make = _children => {
 
         ReasonReact.Update({...state, skeletons: updatedSkeletons});
       | KillSkeleton(deathTime, lane) =>
-        /* Flag skeleton to die! */
         let skeleton = Helpers.find(~f=x => x.lane === lane, state.skeletons);
-        let arrIndex = laneToInt(skeleton.lane) - 1;
-        let updatedSkeletons = state.skeletons;
-        updatedSkeletons[arrIndex].status = Dying;
-        updatedSkeletons[arrIndex].deathTime = state.time;
-
+        skeleton.status = Dying;
+        skeleton.deathTime = state.time;
+        
         ReasonReact.UpdateWithSideEffects(
-          {...state, skeletons: updatedSkeletons},
+          {...state, skeletons:  state.skeletons},
           (
             self => {
               let id =
-                setTimeout(
-                  () => {
-                    let updatedSkeletons =
-                      Helpers.filter(
-                        ~f=x => x.lane === lane,
-                        state.skeletons,
-                      );
-                    ();
-                    /* clearTimeout(id); */
-                  },
+                setTimeout(() => {self.send(RemoveSkeleton(lane))},
                   2000,
                 );
-              ();
             }
           ),
         );
+      | RemoveSkeleton(lane) => {
+          let aqr =
+          Helpers.filter(
+            ~f=x => x.lane !== lane,
+            state.skeletons,
+          );
+          ReasonReact.Update({...state, skeletons: aqr});
+      }          
       },
     render: self => {
       let {time, skeletons, _} = self.state;
@@ -141,13 +137,18 @@ let make = _children => {
           <div className="header" onClick=(self.handle(click))>
             (ReasonReact.string(string_of_int(time)))
           </div>
-          <div className="menu" />
+          <div className="menu">
+            <div className="word">(ReasonReact.string("1"))</div>
+            <div className="word">(ReasonReact.string("2"))</div>
+            <div className="word">(ReasonReact.string("3"))</div>
+          </div>
           <div className="content">
             (
               ReasonReact.array(
                 Array.mapi(
                   (i, skeleton) =>
                     <Skeleton
+                      key={j|skeleton-$i|j}
                       lane=(laneToInt(skeleton.lane))
                       startTime=skeletons[i].startTime
                       deathTime=skeletons[i].deathTime

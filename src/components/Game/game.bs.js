@@ -97,10 +97,16 @@ function make() {
                                   onClick: Curry._1(self[/* handle */0], click)
                                 }, String(time)), React.createElement("div", {
                                   className: "menu"
-                                }), React.createElement("div", {
+                                }, React.createElement("div", {
+                                      className: "word"
+                                    }, "1"), React.createElement("div", {
+                                      className: "word"
+                                    }, "2"), React.createElement("div", {
+                                      className: "word"
+                                    }, "3")), React.createElement("div", {
                                   className: "content"
                                 }, $$Array.mapi((function (i, skeleton) {
-                                        return ReasonReact.element(/* None */0, /* None */0, Skeleton$ReasonScripts.make(Caml_array.caml_array_get(skeletons, i)[/* startTime */0], Caml_array.caml_array_get(skeletons, i)[/* deathTime */2], time, skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
+                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(Caml_array.caml_array_get(skeletons, i)[/* startTime */0], Caml_array.caml_array_get(skeletons, i)[/* deathTime */2], time, skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
                                       }), skeletons), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
                                   className: "footer"
                                 })));
@@ -129,7 +135,7 @@ function make() {
                                             ]));
                               } else {
                                 var lastArrayIndex = state[/* skeletons */2].length - 1 | 0;
-                                if ((state[/* time */0] - Caml_array.caml_array_get(state[/* skeletons */2], lastArrayIndex)[/* startTime */0] | 0) === 200) {
+                                if ((state[/* time */0] - Caml_array.caml_array_get(state[/* skeletons */2], lastArrayIndex)[/* startTime */0] | 0) === 50) {
                                   return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(0, [
                                                 state[/* time */0],
                                                 /* Middle */1
@@ -140,48 +146,57 @@ function make() {
                               }
                             })
                         ]);
-              } else if (action.tag) {
-                var lane = action[1];
-                var skeleton = Helpers$ReasonScripts.find((function (x) {
-                        return x[/* lane */1] === lane;
-                      }), state[/* skeletons */2]);
-                var arrIndex = (skeleton[/* lane */1] + 1 | 0) - 1 | 0;
-                var updatedSkeletons = state[/* skeletons */2];
-                Caml_array.caml_array_get(updatedSkeletons, arrIndex)[/* status */3] = /* Dying */2;
-                Caml_array.caml_array_get(updatedSkeletons, arrIndex)[/* deathTime */2] = state[/* time */0];
-                return /* UpdateWithSideEffects */Block.__(2, [
-                          /* record */[
-                            /* time */state[/* time */0],
-                            /* intervalId */state[/* intervalId */1],
-                            /* skeletons */updatedSkeletons
-                          ],
-                          (function () {
-                              setTimeout((function () {
-                                      Helpers$ReasonScripts.filter((function (x) {
-                                              return x[/* lane */1] === lane;
-                                            }), state[/* skeletons */2]);
-                                      return /* () */0;
-                                    }), 2000);
-                              return /* () */0;
-                            })
-                        ]);
               } else {
-                var skeleton$1 = /* record */[
-                  /* startTime */action[0],
-                  /* lane */action[1],
-                  /* deathTime */0,
-                  /* status : Walking */0
-                ];
-                var existingSkeletons = ArrayLabels.to_list(state[/* skeletons */2]);
-                var updatedSkeletons$1 = ArrayLabels.of_list(/* :: */[
-                      skeleton$1,
-                      existingSkeletons
-                    ]);
-                return /* Update */Block.__(0, [/* record */[
-                            /* time */state[/* time */0],
-                            /* intervalId */state[/* intervalId */1],
-                            /* skeletons */updatedSkeletons$1
-                          ]]);
+                switch (action.tag | 0) {
+                  case 0 : 
+                      var skeleton = /* record */[
+                        /* startTime */action[0],
+                        /* lane */action[1],
+                        /* deathTime */0,
+                        /* status : Walking */0
+                      ];
+                      var existingSkeletons = ArrayLabels.to_list(state[/* skeletons */2]);
+                      var updatedSkeletons = ArrayLabels.of_list(/* :: */[
+                            skeleton,
+                            existingSkeletons
+                          ]);
+                      return /* Update */Block.__(0, [/* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */updatedSkeletons
+                                ]]);
+                  case 1 : 
+                      var lane = action[1];
+                      var skeleton$1 = Helpers$ReasonScripts.find((function (x) {
+                              return x[/* lane */1] === lane;
+                            }), state[/* skeletons */2]);
+                      skeleton$1[/* status */3] = /* Dying */2;
+                      skeleton$1[/* deathTime */2] = state[/* time */0];
+                      return /* UpdateWithSideEffects */Block.__(2, [
+                                /* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */state[/* skeletons */2]
+                                ],
+                                (function (self) {
+                                    setTimeout((function () {
+                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(2, [lane]));
+                                          }), 2000);
+                                    return /* () */0;
+                                  })
+                              ]);
+                  case 2 : 
+                      var lane$1 = action[0];
+                      var aqr = Helpers$ReasonScripts.filter((function (x) {
+                              return x[/* lane */1] !== lane$1;
+                            }), state[/* skeletons */2]);
+                      return /* Update */Block.__(0, [/* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */aqr
+                                ]]);
+                  
+                }
               }
             }),
           /* subscriptions */gameComponent[/* subscriptions */13],

@@ -79,6 +79,7 @@ function make(_, _$1) {
                               }
                             }, $$Array.of_list(List.map((function (i) {
                                         return React.createElement("div", {
+                                                    key: "row-" + (String(i) + ""),
                                                     className: Cn.make(/* :: */[
                                                           "cell",
                                                           /* :: */[
