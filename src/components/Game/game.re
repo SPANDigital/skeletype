@@ -19,10 +19,13 @@ type state = {
   time: int,
   intervalId: ref(option(Js.Global.intervalId)),
   skeletons: array(skeleton),
+  text: string, 
+  refTextField: ref(option(Dom.element))
 };
 
 type action =
   | Tick
+  | ProcessInput(string)
   | SpawnSkeleton(int, lane)
   | KillSkeleton(int, lane)
   | RemoveSkeleton(lane);
@@ -66,14 +69,36 @@ let updateGameStatus = (status: gameState, self) =>
     startTimer(self);
   };
 
+let setSectionRef = (theRef, {ReasonReact.state}) => {
+  state.refTextField := Js.Nullable.toOption(theRef);
+};
+
 let gameComponent = ReasonReact.reducerComponent("Game");
 let make = _children => {
   let click = (event, self) =>
     self.ReasonReact.send(KillSkeleton(self.state.time, Top));
+  let handleType = (event, self) => {
+    let text = ReactDOMRe.domElementToObj(ReactEventRe.Keyboard.target(event))##value;
+    Js.log(text);
+    self.ReasonReact.send(ProcessInput(text));
+  };
   {
     ...gameComponent,
-    initialState: () => {time: 0, skeletons: [||], intervalId: ref(None)},
+    initialState: () => {
+      time: 0, 
+      skeletons: [||], 
+      intervalId: ref(None),
+      text: "",
+      refTextField: ref(None)
+    },
     didMount: self => updateGameStatus(Playing(Top), self),
+    didUpdate: ({oldSelf, newSelf}) =>
+    switch (newSelf.state.refTextField^) {
+    | (Some(field)) =>
+      let node = ReactDOMRe.domElementToObj(field);
+      ignore(node##focus());
+    | _ => ()
+    },
     reducer: (action, state) =>
       switch (action) {
       | Tick =>
@@ -92,6 +117,10 @@ let make = _children => {
               }
           ),
         )
+      | ProcessInput(text) => {
+        
+        ReasonReact.Update({...state, text: text});
+      }
       | SpawnSkeleton(startTime, lane) =>
         let skeleton: skeleton = {
           startTime,
@@ -129,12 +158,12 @@ let make = _children => {
           ReasonReact.Update({...state, skeletons: aqr});
       }          
       },
-    render: self => {
-      let {time, skeletons, _} = self.state;
+    render:  ({state, handle, send}) => {
+      let {time, skeletons, _} = state;
 
       <div className="world">
         <div className="layout">
-          <div className="header" onClick=(self.handle(click))>
+          <div className="header" onClick=(handle(click))>
             (ReasonReact.string(string_of_int(time)))
           </div>
           <div className="menu">
@@ -163,7 +192,19 @@ let make = _children => {
             <Row number="2" />
             <Row number="3" />
           </div>
-          <div className="footer" />
+          <div className="footer">
+            <input 
+              ref={handle(setSectionRef)} 
+              onChange=(
+                event =>
+                  send(
+                    ProcessInput(
+                      ReactDOMRe.domElementToObj(ReactEventRe.Form.target(event))##value,
+                    ),
+                  )
+              )
+              value=state.text />
+          </div>
         </div>
       </div>;
     },

@@ -40,10 +40,10 @@
           background-size: 100px;
           background-repeat: no-repeat; }
     .world .layout .row {
+      display: flex;
       flex: 1;
       flex-direction: column;
-      justify-content: flex-end;
-      justify-items: flex-end; }
+      justify-content: center; }
       .world .layout .row .spriteGrid {
         display: grid;
         grid-template-columns: repeat(12, 1fr); }
@@ -59,3 +59,14 @@
             background-position: 0px -5px; }
   .world .footer {
     grid-area: f; }
+    .world .footer input {
+      border: 2px #ffffff91;
+      border-radius: 4px;
+      font-size: 22px;
+      color: #f9f9f9;
+      font-family: 'Press Start 2P', cursive;
+      padding: 5px;
+      text-align: center;
+      background: #ffffff38; }
+      .world .footer input:focus {
+        outline: none; }

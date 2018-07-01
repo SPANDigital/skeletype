@@ -9,12 +9,15 @@ let make = (~startTime, ~deathTime, ~time, ~lane, ~status, _children) => {
   render: self => {
     let startPosition = time - startTime;
     let timeString = ref(string_of_int(startPosition * 2) ++ "px");
-    let positionFromTop = string_of_int(lane * 30) ++ "%";
+    let positionFromTop = switch (lane) {
+      | 1 => "16%"
+      | 2 => "44%"
+      | 3 => "64%"
+      };
 
     if (status === Dying) {
       Js.log(deathTime);
       timeString := string_of_int(deathTime * 2) ++ "px";
-      ignore();
     };
 
     <div

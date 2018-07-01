@@ -2,8 +2,8 @@
 
 import * as Cn from "re-classnames/src/Cn.bs.js";
 import * as React from "react";
-import * as Caml_int32 from "bs-platform/lib/es6/caml_int32.js";
 import * as ReasonReact from "reason-react/src/ReasonReact.js";
+import * as Caml_builtin_exceptions from "bs-platform/lib/es6/caml_builtin_exceptions.js";
 
 var rowComponent = ReasonReact.statelessComponent("Skeleton");
 
@@ -21,7 +21,31 @@ function make(startTime, deathTime, time, lane, status, _) {
           /* render */(function () {
               var startPosition = time - startTime | 0;
               var timeString = [String((startPosition << 1)) + "px"];
-              var positionFromTop = String(Caml_int32.imul(lane, 30)) + "%";
+              var switcher = lane - 1 | 0;
+              var positionFromTop;
+              if (switcher > 2 || switcher < 0) {
+                throw [
+                      Caml_builtin_exceptions.match_failure,
+                      [
+                        "Skeleton.re",
+                        12,
+                        26
+                      ]
+                    ];
+              } else {
+                switch (switcher) {
+                  case 0 : 
+                      positionFromTop = "16%";
+                      break;
+                  case 1 : 
+                      positionFromTop = "44%";
+                      break;
+                  case 2 : 
+                      positionFromTop = "64%";
+                      break;
+                  
+                }
+              }
               if (status === /* Dying */2) {
                 console.log(deathTime);
                 timeString[0] = String((deathTime << 1)) + "px";

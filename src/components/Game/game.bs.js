@@ -63,11 +63,16 @@ function updateGameStatus(status, self) {
   }
 }
 
+function setSectionRef(theRef, param) {
+  param[/* state */1][/* refTextField */4][0] = (theRef == null) ? /* None */0 : [theRef];
+  return /* () */0;
+}
+
 var gameComponent = ReasonReact.reducerComponent("Game");
 
 function make() {
   var click = function (_, self) {
-    return Curry._1(self[/* send */3], /* KillSkeleton */Block.__(1, [
+    return Curry._1(self[/* send */3], /* KillSkeleton */Block.__(2, [
                   self[/* state */1][/* time */0],
                   /* Top */0
                 ]));
@@ -80,21 +85,31 @@ function make() {
           /* didMount */(function (self) {
               return updateGameStatus(/* Playing */[/* Top */0], self);
             }),
-          /* didUpdate */gameComponent[/* didUpdate */5],
+          /* didUpdate */(function (param) {
+              var match = param[/* newSelf */1][/* state */1][/* refTextField */4][0];
+              if (match) {
+                match[0].focus();
+                return /* () */0;
+              } else {
+                return /* () */0;
+              }
+            }),
           /* willUnmount */gameComponent[/* willUnmount */6],
           /* willUpdate */gameComponent[/* willUpdate */7],
           /* shouldUpdate */gameComponent[/* shouldUpdate */8],
-          /* render */(function (self) {
-              var match = self[/* state */1];
-              var skeletons = match[/* skeletons */2];
-              var time = match[/* time */0];
+          /* render */(function (param) {
+              var state = param[/* state */1];
+              var skeletons = state[/* skeletons */2];
+              var time = state[/* time */0];
+              var send = param[/* send */3];
+              var handle = param[/* handle */0];
               return React.createElement("div", {
                           className: "world"
                         }, React.createElement("div", {
                               className: "layout"
                             }, React.createElement("div", {
                                   className: "header",
-                                  onClick: Curry._1(self[/* handle */0], click)
+                                  onClick: Curry._1(handle, click)
                                 }, String(time)), React.createElement("div", {
                                   className: "menu"
                                 }, React.createElement("div", {
@@ -109,13 +124,21 @@ function make() {
                                         return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(Caml_array.caml_array_get(skeletons, i)[/* startTime */0], Caml_array.caml_array_get(skeletons, i)[/* deathTime */2], time, skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
                                       }), skeletons), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
                                   className: "footer"
-                                })));
+                                }, React.createElement("input", {
+                                      ref: Curry._1(handle, setSectionRef),
+                                      value: state[/* text */3],
+                                      onChange: (function ($$event) {
+                                          return Curry._1(send, /* ProcessInput */Block.__(0, [$$event.target.value]));
+                                        })
+                                    }))));
             }),
           /* initialState */(function () {
               return /* record */[
                       /* time */0,
                       /* intervalId */[/* None */0],
-                      /* skeletons : array */[]
+                      /* skeletons : array */[],
+                      /* text */"",
+                      /* refTextField */[/* None */0]
                     ];
             }),
           /* retainedProps */gameComponent[/* retainedProps */11],
@@ -125,18 +148,20 @@ function make() {
                           /* record */[
                             /* time */state[/* time */0] + 1 | 0,
                             /* intervalId */state[/* intervalId */1],
-                            /* skeletons */state[/* skeletons */2]
+                            /* skeletons */state[/* skeletons */2],
+                            /* text */state[/* text */3],
+                            /* refTextField */state[/* refTextField */4]
                           ],
                           (function (self) {
                               if (state[/* time */0] === 0) {
-                                return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(0, [
+                                return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(1, [
                                               state[/* time */0],
                                               /* Top */0
                                             ]));
                               } else {
                                 var lastArrayIndex = state[/* skeletons */2].length - 1 | 0;
                                 if ((state[/* time */0] - Caml_array.caml_array_get(state[/* skeletons */2], lastArrayIndex)[/* startTime */0] | 0) === 50) {
-                                  return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(0, [
+                                  return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(1, [
                                                 state[/* time */0],
                                                 /* Middle */1
                                               ]));
@@ -149,6 +174,14 @@ function make() {
               } else {
                 switch (action.tag | 0) {
                   case 0 : 
+                      return /* Update */Block.__(0, [/* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */state[/* skeletons */2],
+                                  /* text */action[0],
+                                  /* refTextField */state[/* refTextField */4]
+                                ]]);
+                  case 1 : 
                       var skeleton = /* record */[
                         /* startTime */action[0],
                         /* lane */action[1],
@@ -163,9 +196,11 @@ function make() {
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */updatedSkeletons
+                                  /* skeletons */updatedSkeletons,
+                                  /* text */state[/* text */3],
+                                  /* refTextField */state[/* refTextField */4]
                                 ]]);
-                  case 1 : 
+                  case 2 : 
                       var lane = action[1];
                       var skeleton$1 = Helpers$ReasonScripts.find((function (x) {
                               return x[/* lane */1] === lane;
@@ -176,16 +211,18 @@ function make() {
                                 /* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2]
+                                  /* skeletons */state[/* skeletons */2],
+                                  /* text */state[/* text */3],
+                                  /* refTextField */state[/* refTextField */4]
                                 ],
                                 (function (self) {
                                     setTimeout((function () {
-                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(2, [lane]));
+                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(3, [lane]));
                                           }), 2000);
                                     return /* () */0;
                                   })
                               ]);
-                  case 2 : 
+                  case 3 : 
                       var lane$1 = action[0];
                       var aqr = Helpers$ReasonScripts.filter((function (x) {
                               return x[/* lane */1] !== lane$1;
@@ -193,7 +230,9 @@ function make() {
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */aqr
+                                  /* skeletons */aqr,
+                                  /* text */state[/* text */3],
+                                  /* refTextField */state[/* refTextField */4]
                                 ]]);
                   
                 }
@@ -209,6 +248,7 @@ export {
   spawnSkeleton ,
   startTimer ,
   updateGameStatus ,
+  setSectionRef ,
   gameComponent ,
   make ,
   

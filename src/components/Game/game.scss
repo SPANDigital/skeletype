@@ -46,10 +46,10 @@
       }
     }
     .row {
+      display: flex;
       flex: 1;
       flex-direction: column;
-      justify-content: flex-end;
-      justify-items: flex-end;
+      justify-content: center;
       .spriteGrid {
         display: grid;
         grid-template-columns: repeat(12, 1fr);
@@ -72,5 +72,18 @@
   }
   .footer {
     grid-area: f;
+    input {
+      border: 2px #ffffff91;
+      border-radius: 4px;
+      font-size: 22px;
+      color: #f9f9f9;
+      font-family: 'Press Start 2P', cursive;
+      padding: 5px;
+      text-align: center;
+      background: #ffffff38;
+      &:focus {
+        outline: none;
+      }
+    }
   }
 }
