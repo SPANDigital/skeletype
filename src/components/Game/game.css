@@ -1,0 +1,51 @@
+.world {
+  background: #4a313d;
+  display: flex;
+  flex-direction: row;
+  justify-content: center; }
+  .world .layout {
+    display: grid;
+    grid-template-rows: 50px 1fr 50px;
+    grid-gap: 5px;
+    grid-template-areas: 'h h h h h h h h h h h h' 'c c c c c c c c c c m m' 'f f f f f f f f f f f f';
+    height: 100vh;
+    width: 1297px; }
+    .world .layout .header {
+      grid-area: h; }
+    .world .layout .menu {
+      grid-area: m; }
+    .world .layout .content {
+      grid-area: c;
+      display: flex;
+      flex-direction: column; }
+      .world .layout .content .skeleton {
+        position: absolute;
+        width: 80px;
+        height: 80px;
+        background: url(../../assets/undead/undead_walk.gif);
+        background-size: 80px; }
+        .world .layout .content .skeleton.dying {
+          background: url(../../assets/undead/undead_death.gif);
+          background-position-y: 12px;
+          background-position-x: 10px;
+          background-size: 100px;
+          background-repeat: no-repeat; }
+    .world .layout .row {
+      flex: 1;
+      flex-direction: column;
+      justify-content: center; }
+      .world .layout .row .spriteGrid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr); }
+        .world .layout .row .spriteGrid .cell {
+          height: 45px;
+          background: url(../../assets/dungeon-tileset.png);
+          background-size: 400px; }
+          .world .layout .row .spriteGrid .cell.row-top {
+            background-position: -14px -19px; }
+          .world .layout .row .spriteGrid .cell.row-middle {
+            background-position: -26px -149px; }
+          .world .layout .row .spriteGrid .cell.row-bottom {
+            background-position: 0px -5px; }
+  .world .footer {
+    grid-area: f; }
