@@ -9,7 +9,8 @@ let make = (~startTime, ~deathTime, ~time, ~lane, ~status, _children) => {
   render: self => {
     let startPosition = time - startTime;
     let timeString = ref(string_of_int(startPosition * 2) ++ "px");
-    let positionFromTop = switch (lane) {
+    let positionFromTop =
+      switch (lane) {
       | 1 => "16%"
       | 2 => "44%"
       | 3 => "64%"
@@ -28,7 +29,7 @@ let make = (~startTime, ~deathTime, ~time, ~lane, ~status, _children) => {
         ReactDOMRe.Style.make(
           ~top=positionFromTop,
           ~transform={j|translateX($timeString)|j},
-          ignore()
+          ignore(),
         )
       )
     />;

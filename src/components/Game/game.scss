@@ -19,11 +19,12 @@
       display: flex;
       -ms-flex-direction: column;
       flex-direction: column;
-      .word {
+      .word-box {
         display: flex;
         flex: 1;
         flex-direction: column;
         justify-content: center;
+        .word {}
       }
     }
     .content {
@@ -80,7 +81,8 @@
       font-family: 'Press Start 2P', cursive;
       padding: 5px;
       text-align: center;
-      background: #ffffff38;
+      background: transparent;
+      border: 2px dashed #ffffff;
       &:focus {
         outline: none;
       }

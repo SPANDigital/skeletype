@@ -8,6 +8,7 @@ import * as Caml_array from "bs-platform/lib/es6/caml_array.js";
 import * as ArrayLabels from "bs-platform/lib/es6/arrayLabels.js";
 import * as ReasonReact from "reason-react/src/ReasonReact.js";
 import * as Row$ReasonScripts from "./Elements/Row.bs.js";
+import * as Word$ReasonScripts from "./Elements/Word.bs.js";
 import * as Helpers$ReasonScripts from "../../utils/Helpers.bs.js";
 import * as Skeleton$ReasonScripts from "./Elements/Skeleton.bs.js";
 
@@ -17,54 +18,8 @@ function laneToInt(lane) {
   return lane + 1 | 0;
 }
 
-function spawnSkeleton(lane) {
-  switch (lane) {
-    case 0 : 
-        console.log("Top");
-        return /* () */0;
-    case 1 : 
-        console.log("Middle");
-        return /* () */0;
-    case 2 : 
-        console.log("Bottom");
-        return /* () */0;
-    
-  }
-}
-
-function startTimer(self) {
-  var intervalId = /* Some */[setInterval((function () {
-            return Curry._1(self[/* send */3], /* Tick */0);
-          }), 25)];
-  self[/* state */1][/* intervalId */1][0] = intervalId;
-  return /* () */0;
-}
-
-function updateGameStatus(status, self) {
-  if (typeof status === "number") {
-    switch (status) {
-      case 0 : 
-          console.log("Menu");
-          return /* () */0;
-      case 1 : 
-          console.log("CountDown");
-          return /* () */0;
-      case 2 : 
-          console.log("Won");
-          return /* () */0;
-      case 3 : 
-          console.log("Lost");
-          return /* () */0;
-      
-    }
-  } else {
-    spawnSkeleton(status[0]);
-    return startTimer(self);
-  }
-}
-
 function setSectionRef(theRef, param) {
-  param[/* state */1][/* refTextField */4][0] = (theRef == null) ? /* None */0 : [theRef];
+  param[/* state */1][/* refTextField */5][0] = (theRef == null) ? /* None */0 : [theRef];
   return /* () */0;
 }
 
@@ -72,7 +27,7 @@ var gameComponent = ReasonReact.reducerComponent("Game");
 
 function make() {
   var click = function (_, self) {
-    return Curry._1(self[/* send */3], /* KillSkeleton */Block.__(2, [
+    return Curry._1(self[/* send */3], /* KillSkeleton */Block.__(3, [
                   self[/* state */1][/* time */0],
                   /* Top */0
                 ]));
@@ -83,10 +38,14 @@ function make() {
           /* handedOffState */gameComponent[/* handedOffState */2],
           /* willReceiveProps */gameComponent[/* willReceiveProps */3],
           /* didMount */(function (self) {
-              return updateGameStatus(/* Playing */[/* Top */0], self);
+              var intervalId = /* Some */[setInterval((function () {
+                        return Curry._1(self[/* send */3], /* Tick */0);
+                      }), 25)];
+              self[/* state */1][/* intervalId */1][0] = intervalId;
+              return /* () */0;
             }),
           /* didUpdate */(function (param) {
-              var match = param[/* newSelf */1][/* state */1][/* refTextField */4][0];
+              var match = param[/* newSelf */1][/* state */1][/* refTextField */5][0];
               if (match) {
                 match[0].focus();
                 return /* () */0;
@@ -94,12 +53,20 @@ function make() {
                 return /* () */0;
               }
             }),
-          /* willUnmount */gameComponent[/* willUnmount */6],
+          /* willUnmount */(function (self) {
+              var match = self[/* state */1][/* intervalId */1][0];
+              if (match) {
+                clearInterval(match[0]);
+                return /* () */0;
+              } else {
+                return /* () */0;
+              }
+            }),
           /* willUpdate */gameComponent[/* willUpdate */7],
           /* shouldUpdate */gameComponent[/* shouldUpdate */8],
           /* render */(function (param) {
               var state = param[/* state */1];
-              var skeletons = state[/* skeletons */2];
+              var text = state[/* text */4];
               var time = state[/* time */0];
               var send = param[/* send */3];
               var handle = param[/* handle */0];
@@ -112,21 +79,17 @@ function make() {
                                   onClick: Curry._1(handle, click)
                                 }, String(time)), React.createElement("div", {
                                   className: "menu"
-                                }, React.createElement("div", {
-                                      className: "word"
-                                    }, "1"), React.createElement("div", {
-                                      className: "word"
-                                    }, "2"), React.createElement("div", {
-                                      className: "word"
-                                    }, "3")), React.createElement("div", {
+                                }, $$Array.mapi((function (_, word) {
+                                        return ReasonReact.element(/* None */0, /* None */0, Word$ReasonScripts.make(word[/* randomWord */0], text, /* array */[]));
+                                      }), state[/* words */3])), React.createElement("div", {
                                   className: "content"
                                 }, $$Array.mapi((function (i, skeleton) {
-                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(Caml_array.caml_array_get(skeletons, i)[/* startTime */0], Caml_array.caml_array_get(skeletons, i)[/* deathTime */2], time, skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
-                                      }), skeletons), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
+                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(skeleton[/* startTime */0], skeleton[/* deathTime */2], time, skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
+                                      }), state[/* skeletons */2]), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
                                   className: "footer"
                                 }, React.createElement("input", {
                                       ref: Curry._1(handle, setSectionRef),
-                                      value: state[/* text */3],
+                                      value: state[/* text */4],
                                       onChange: (function ($$event) {
                                           return Curry._1(send, /* ProcessInput */Block.__(0, [$$event.target.value]));
                                         })
@@ -137,6 +100,7 @@ function make() {
                       /* time */0,
                       /* intervalId */[/* None */0],
                       /* skeletons : array */[],
+                      /* words : array */[],
                       /* text */"",
                       /* refTextField */[/* None */0]
                     ];
@@ -149,19 +113,23 @@ function make() {
                             /* time */state[/* time */0] + 1 | 0,
                             /* intervalId */state[/* intervalId */1],
                             /* skeletons */state[/* skeletons */2],
-                            /* text */state[/* text */3],
-                            /* refTextField */state[/* refTextField */4]
+                            /* words */state[/* words */3],
+                            /* text */state[/* text */4],
+                            /* refTextField */state[/* refTextField */5]
                           ],
                           (function (self) {
                               if (state[/* time */0] === 0) {
-                                return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(1, [
-                                              state[/* time */0],
-                                              /* Top */0
-                                            ]));
+                                Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(2, [
+                                        state[/* time */0],
+                                        /* Top */0
+                                      ]));
+                                Curry._1(self[/* send */3], /* AddWord */Block.__(1, ["HERE"]));
+                                Curry._1(self[/* send */3], /* AddWord */Block.__(1, ["THERE"]));
+                                return Curry._1(self[/* send */3], /* AddWord */Block.__(1, ["SOMMER"]));
                               } else {
                                 var lastArrayIndex = state[/* skeletons */2].length - 1 | 0;
                                 if ((state[/* time */0] - Caml_array.caml_array_get(state[/* skeletons */2], lastArrayIndex)[/* startTime */0] | 0) === 50) {
-                                  return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(1, [
+                                  return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(2, [
                                                 state[/* time */0],
                                                 /* Middle */1
                                               ]));
@@ -174,14 +142,35 @@ function make() {
               } else {
                 switch (action.tag | 0) {
                   case 0 : 
+                      return /* UpdateWithSideEffects */Block.__(2, [
+                                /* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */state[/* skeletons */2],
+                                  /* words */state[/* words */3],
+                                  /* text */action[0],
+                                  /* refTextField */state[/* refTextField */5]
+                                ],
+                                (function () {
+                                    return /* () */0;
+                                  })
+                              ]);
+                  case 1 : 
+                      var word = /* record */[/* randomWord */action[0]];
+                      var existingWords = ArrayLabels.to_list(state[/* words */3]);
+                      var updatedWords = ArrayLabels.of_list(/* :: */[
+                            word,
+                            existingWords
+                          ]);
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */state[/* skeletons */2],
-                                  /* text */action[0],
-                                  /* refTextField */state[/* refTextField */4]
+                                  /* words */updatedWords,
+                                  /* text */state[/* text */4],
+                                  /* refTextField */state[/* refTextField */5]
                                 ]]);
-                  case 1 : 
+                  case 2 : 
                       var skeleton = /* record */[
                         /* startTime */action[0],
                         /* lane */action[1],
@@ -197,10 +186,11 @@ function make() {
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */updatedSkeletons,
-                                  /* text */state[/* text */3],
-                                  /* refTextField */state[/* refTextField */4]
+                                  /* words */state[/* words */3],
+                                  /* text */state[/* text */4],
+                                  /* refTextField */state[/* refTextField */5]
                                 ]]);
-                  case 2 : 
+                  case 3 : 
                       var lane = action[1];
                       var skeleton$1 = Helpers$ReasonScripts.find((function (x) {
                               return x[/* lane */1] === lane;
@@ -212,27 +202,29 @@ function make() {
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */state[/* skeletons */2],
-                                  /* text */state[/* text */3],
-                                  /* refTextField */state[/* refTextField */4]
+                                  /* words */state[/* words */3],
+                                  /* text */state[/* text */4],
+                                  /* refTextField */state[/* refTextField */5]
                                 ],
                                 (function (self) {
                                     setTimeout((function () {
-                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(3, [lane]));
+                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(4, [lane]));
                                           }), 2000);
                                     return /* () */0;
                                   })
                               ]);
-                  case 3 : 
+                  case 4 : 
                       var lane$1 = action[0];
-                      var aqr = Helpers$ReasonScripts.filter((function (x) {
+                      var remainingSkeletons = Helpers$ReasonScripts.filter((function (x) {
                               return x[/* lane */1] !== lane$1;
                             }), state[/* skeletons */2]);
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */aqr,
-                                  /* text */state[/* text */3],
-                                  /* refTextField */state[/* refTextField */4]
+                                  /* skeletons */remainingSkeletons,
+                                  /* words */state[/* words */3],
+                                  /* text */state[/* text */4],
+                                  /* refTextField */state[/* refTextField */5]
                                 ]]);
                   
                 }
@@ -245,9 +237,6 @@ function make() {
 
 export {
   laneToInt ,
-  spawnSkeleton ,
-  startTimer ,
-  updateGameStatus ,
   setSectionRef ,
   gameComponent ,
   make ,

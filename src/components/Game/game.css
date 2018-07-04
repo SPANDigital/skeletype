@@ -18,7 +18,7 @@
       display: flex;
       -ms-flex-direction: column;
       flex-direction: column; }
-      .world .layout .menu .word {
+      .world .layout .menu .word-box {
         display: flex;
         flex: 1;
         flex-direction: column;
@@ -67,6 +67,7 @@
       font-family: 'Press Start 2P', cursive;
       padding: 5px;
       text-align: center;
-      background: #ffffff38; }
+      background: transparent;
+      border: 2px dashed #ffffff; }
       .world .footer input:focus {
         outline: none; }

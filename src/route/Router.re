@@ -32,7 +32,7 @@ module WithRouter = {
 
 module Link = {
   let component = ReasonReact.statelessComponent("Link");
-  let make = (~route, ~className="", children) => {
+  let make = (~route, ~className=?, children) => {
     ...component,
     render: self => {
       let href = Config.routeToString(route);

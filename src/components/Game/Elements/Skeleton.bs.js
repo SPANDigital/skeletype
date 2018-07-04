@@ -28,8 +28,8 @@ function make(startTime, deathTime, time, lane, status, _) {
                       Caml_builtin_exceptions.match_failure,
                       [
                         "Skeleton.re",
-                        12,
-                        26
+                        13,
+                        6
                       ]
                     ];
               } else {

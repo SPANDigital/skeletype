@@ -54,8 +54,7 @@ var WithRouter = /* module */[
 
 var component$1 = ReasonReact.statelessComponent("Link");
 
-function make$1(route, $staropt$star, children) {
-  var className = $staropt$star ? $staropt$star[0] : "";
+function make$1(route, className, children) {
   return /* record */[
           /* debugName */component$1[/* debugName */0],
           /* reactClassInternal */component$1[/* reactClassInternal */1],
