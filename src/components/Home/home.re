@@ -12,9 +12,9 @@ let make = _children => {
     ...component,
     render: ({state, handle, send}) =>
       <div className="Home">
-        <div className="logo"> (ReasonReact.string("Skeletype")) </div>
-        <img src=skully />
-        <div className="start-button" onClick=(handle(click))>
+        <img className="logo" src=skully />
+        <div className="tagline"> (ReasonReact.string("Skeletype")) </div>
+        <div className="eightbit-btn" onClick=(handle(click))>
           (ReasonReact.string("Start"))
         </div>
       </div>,

@@ -11,6 +11,7 @@ import * as Row$ReasonScripts from "./Elements/Row.bs.js";
 import * as Word$ReasonScripts from "./Elements/Word.bs.js";
 import * as Helpers$ReasonScripts from "../../utils/Helpers.bs.js";
 import * as Skeleton$ReasonScripts from "./Elements/Skeleton.bs.js";
+import * as Dictionary$ReasonScripts from "./Elements/Dictionary.bs.js";
 
 ((require('./game.css')));
 
@@ -23,15 +24,29 @@ function setSectionRef(theRef, param) {
   return /* () */0;
 }
 
+function fillWords() {
+  var wordTop = /* record */[
+    /* randomWord */"yo",
+    /* wordLane : Top */0
+  ];
+  var wordMiddle = /* record */[
+    /* randomWord */"hey",
+    /* wordLane : Middle */1
+  ];
+  var wordBottom = /* record */[
+    /* randomWord */"wow",
+    /* wordLane : Bottom */2
+  ];
+  return /* array */[
+          wordTop,
+          wordMiddle,
+          wordBottom
+        ];
+}
+
 var gameComponent = ReasonReact.reducerComponent("Game");
 
 function make() {
-  var click = function (_, self) {
-    return Curry._1(self[/* send */3], /* KillSkeleton */Block.__(3, [
-                  self[/* state */1][/* time */0],
-                  /* Top */0
-                ]));
-  };
   return /* record */[
           /* debugName */gameComponent[/* debugName */0],
           /* reactClassInternal */gameComponent[/* reactClassInternal */1],
@@ -66,30 +81,34 @@ function make() {
           /* shouldUpdate */gameComponent[/* shouldUpdate */8],
           /* render */(function (param) {
               var state = param[/* state */1];
-              var text = state[/* text */4];
+              var input = state[/* input */4];
               var time = state[/* time */0];
               var send = param[/* send */3];
-              var handle = param[/* handle */0];
               return React.createElement("div", {
                           className: "world"
                         }, React.createElement("div", {
                               className: "layout"
                             }, React.createElement("div", {
-                                  className: "header",
-                                  onClick: Curry._1(handle, click)
-                                }, String(time)), React.createElement("div", {
+                                  className: "header"
+                                }, React.createElement("div", {
+                                      className: "begging"
+                                    }, "SKELETYPE"), React.createElement("div", {
+                                      className: "middle"
+                                    }, String(time)), React.createElement("div", {
+                                      className: "end"
+                                    }, "X")), React.createElement("div", {
                                   className: "menu"
                                 }, $$Array.mapi((function (_, word) {
-                                        return ReasonReact.element(/* None */0, /* None */0, Word$ReasonScripts.make(word[/* randomWord */0], text, /* array */[]));
+                                        return ReasonReact.element(/* None */0, /* None */0, Word$ReasonScripts.make(word[/* randomWord */0], input, /* array */[]));
                                       }), state[/* words */3])), React.createElement("div", {
                                   className: "content"
                                 }, $$Array.mapi((function (i, skeleton) {
-                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(skeleton[/* startTime */0], skeleton[/* deathTime */2], time, skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
+                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(time, skeleton[/* startTime */0], skeleton[/* deathTime */2], skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
                                       }), state[/* skeletons */2]), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
                                   className: "footer"
                                 }, React.createElement("input", {
-                                      ref: Curry._1(handle, setSectionRef),
-                                      value: state[/* text */4],
+                                      ref: Curry._1(param[/* handle */0], setSectionRef),
+                                      value: state[/* input */4],
                                       onChange: (function ($$event) {
                                           return Curry._1(send, /* ProcessInput */Block.__(0, [$$event.target.value]));
                                         })
@@ -100,45 +119,67 @@ function make() {
                       /* time */0,
                       /* intervalId */[/* None */0],
                       /* skeletons : array */[],
-                      /* words : array */[],
-                      /* text */"",
+                      /* words */fillWords(/* () */0),
+                      /* input */"",
                       /* refTextField */[/* None */0]
                     ];
             }),
           /* retainedProps */gameComponent[/* retainedProps */11],
           /* reducer */(function (action, state) {
               if (typeof action === "number") {
-                return /* UpdateWithSideEffects */Block.__(2, [
-                          /* record */[
-                            /* time */state[/* time */0] + 1 | 0,
-                            /* intervalId */state[/* intervalId */1],
-                            /* skeletons */state[/* skeletons */2],
-                            /* words */state[/* words */3],
-                            /* text */state[/* text */4],
-                            /* refTextField */state[/* refTextField */5]
-                          ],
-                          (function (self) {
-                              if (state[/* time */0] === 0) {
-                                Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(2, [
-                                        state[/* time */0],
-                                        /* Top */0
-                                      ]));
-                                Curry._1(self[/* send */3], /* AddWord */Block.__(1, ["HERE"]));
-                                Curry._1(self[/* send */3], /* AddWord */Block.__(1, ["THERE"]));
-                                return Curry._1(self[/* send */3], /* AddWord */Block.__(1, ["SOMMER"]));
-                              } else {
-                                var lastArrayIndex = state[/* skeletons */2].length - 1 | 0;
-                                if ((state[/* time */0] - Caml_array.caml_array_get(state[/* skeletons */2], lastArrayIndex)[/* startTime */0] | 0) === 50) {
-                                  return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(2, [
+                if (action === 0) {
+                  return /* UpdateWithSideEffects */Block.__(2, [
+                            /* record */[
+                              /* time */state[/* time */0] + 1 | 0,
+                              /* intervalId */state[/* intervalId */1],
+                              /* skeletons */state[/* skeletons */2],
+                              /* words */state[/* words */3],
+                              /* input */state[/* input */4],
+                              /* refTextField */state[/* refTextField */5]
+                            ],
+                            (function (self) {
+                                if (state[/* time */0] === 0) {
+                                  return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(3, [
                                                 state[/* time */0],
-                                                /* Middle */1
+                                                /* Top */0
                                               ]));
+                                } else if (state[/* time */0] % 100 === 0) {
+                                  var occupiedLanes = ArrayLabels.map((function (s) {
+                                          return s[/* lane */1];
+                                        }), state[/* skeletons */2]);
+                                  var deployedLane = /* Top */0;
+                                  if (occupiedLanes.length !== 3) {
+                                    if (!Helpers$ReasonScripts.contains(/* Top */0, occupiedLanes)) {
+                                      deployedLane = /* Top */0;
+                                    }
+                                    if (!Helpers$ReasonScripts.contains(/* Middle */1, occupiedLanes)) {
+                                      deployedLane = /* Middle */1;
+                                    }
+                                    if (!Helpers$ReasonScripts.contains(/* Bottom */2, occupiedLanes)) {
+                                      deployedLane = /* Bottom */2;
+                                    }
+                                    return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(3, [
+                                                  state[/* time */0],
+                                                  deployedLane
+                                                ]));
+                                  } else {
+                                    return 0;
+                                  }
                                 } else {
                                   return 0;
                                 }
-                              }
-                            })
-                        ]);
+                              })
+                          ]);
+                } else {
+                  return /* Update */Block.__(0, [/* record */[
+                              /* time */state[/* time */0],
+                              /* intervalId */state[/* intervalId */1],
+                              /* skeletons */state[/* skeletons */2],
+                              /* words */state[/* words */3],
+                              /* input */"",
+                              /* refTextField */state[/* refTextField */5]
+                            ]]);
+                }
               } else {
                 switch (action.tag | 0) {
                   case 0 : 
@@ -148,29 +189,79 @@ function make() {
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */state[/* skeletons */2],
                                   /* words */state[/* words */3],
-                                  /* text */action[0],
+                                  /* input */action[0],
                                   /* refTextField */state[/* refTextField */5]
                                 ],
-                                (function () {
-                                    return /* () */0;
+                                (function (self) {
+                                    if (self[/* state */1][/* input */4].length > 0) {
+                                      var matchedWord = Helpers$ReasonScripts.filter((function (x) {
+                                              return x[/* randomWord */0] === self[/* state */1][/* input */4];
+                                            }), state[/* words */3]);
+                                      if (matchedWord.length) {
+                                        var targetWord = Caml_array.caml_array_get(matchedWord, 0)[/* randomWord */0];
+                                        var targetLane = Caml_array.caml_array_get(matchedWord, 0)[/* wordLane */1];
+                                        Curry._1(self[/* send */3], /* ReplaceWord */Block.__(2, [
+                                                targetWord,
+                                                Dictionary$ReasonScripts.getRandomWord(/* () */0)
+                                              ]));
+                                        Curry._1(self[/* send */3], /* KillSkeleton */Block.__(4, [
+                                                self[/* state */1][/* time */0],
+                                                targetLane
+                                              ]));
+                                        return Curry._1(self[/* send */3], /* ClearInput */1);
+                                      } else {
+                                        return 0;
+                                      }
+                                    } else {
+                                      return 0;
+                                    }
                                   })
                               ]);
                   case 1 : 
-                      var word = /* record */[/* randomWord */action[0]];
-                      var existingWords = ArrayLabels.to_list(state[/* words */3]);
-                      var updatedWords = ArrayLabels.of_list(/* :: */[
-                            word,
-                            existingWords
-                          ]);
+                      var wordLane = action[1];
+                      var word = /* record */[
+                        /* randomWord */action[0],
+                        /* wordLane */wordLane
+                      ];
+                      var existingWords = state[/* words */3];
+                      switch (wordLane) {
+                        case 0 : 
+                            Caml_array.caml_array_set(existingWords, 0, word);
+                            break;
+                        case 1 : 
+                            Caml_array.caml_array_set(existingWords, 1, word);
+                            break;
+                        case 2 : 
+                            Caml_array.caml_array_set(existingWords, 2, word);
+                            break;
+                        
+                      }
+                      return /* Update */Block.__(0, [/* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */state[/* skeletons */2],
+                                  /* words */existingWords,
+                                  /* input */state[/* input */4],
+                                  /* refTextField */state[/* refTextField */5]
+                                ]]);
+                  case 2 : 
+                      var oldWord = action[0];
+                      var updatedWords = state[/* words */3];
+                      if (updatedWords.length) {
+                        var entryToReplace = Helpers$ReasonScripts.find((function (x) {
+                                return x[/* randomWord */0] === oldWord;
+                              }), updatedWords);
+                        entryToReplace[/* randomWord */0] = action[1];
+                      }
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */state[/* skeletons */2],
                                   /* words */updatedWords,
-                                  /* text */state[/* text */4],
+                                  /* input */state[/* input */4],
                                   /* refTextField */state[/* refTextField */5]
                                 ]]);
-                  case 2 : 
+                  case 3 : 
                       var skeleton = /* record */[
                         /* startTime */action[0],
                         /* lane */action[1],
@@ -187,43 +278,65 @@ function make() {
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */updatedSkeletons,
                                   /* words */state[/* words */3],
-                                  /* text */state[/* text */4],
+                                  /* input */state[/* input */4],
                                   /* refTextField */state[/* refTextField */5]
                                 ]]);
-                  case 3 : 
+                  case 4 : 
                       var lane = action[1];
                       var skeleton$1 = Helpers$ReasonScripts.find((function (x) {
                               return x[/* lane */1] === lane;
                             }), state[/* skeletons */2]);
                       skeleton$1[/* status */3] = /* Dying */2;
-                      skeleton$1[/* deathTime */2] = state[/* time */0];
+                      skeleton$1[/* deathTime */2] = state[/* time */0] - skeleton$1[/* startTime */0] | 0;
                       return /* UpdateWithSideEffects */Block.__(2, [
                                 /* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */state[/* skeletons */2],
                                   /* words */state[/* words */3],
-                                  /* text */state[/* text */4],
+                                  /* input */state[/* input */4],
                                   /* refTextField */state[/* refTextField */5]
                                 ],
                                 (function (self) {
                                     setTimeout((function () {
-                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(4, [lane]));
-                                          }), 2000);
+                                            return Curry._1(self[/* send */3], /* FlagSkeletonAsDead */Block.__(5, [lane]));
+                                          }), 1000);
                                     return /* () */0;
                                   })
                               ]);
-                  case 4 : 
+                  case 5 : 
                       var lane$1 = action[0];
+                      var skeleton$2 = Helpers$ReasonScripts.find((function (x) {
+                              return x[/* lane */1] === lane$1;
+                            }), state[/* skeletons */2]);
+                      skeleton$2[/* status */3] = /* Dead */3;
+                      return /* UpdateWithSideEffects */Block.__(2, [
+                                /* record */[
+                                  /* time */state[/* time */0],
+                                  /* intervalId */state[/* intervalId */1],
+                                  /* skeletons */state[/* skeletons */2],
+                                  /* words */state[/* words */3],
+                                  /* input */state[/* input */4],
+                                  /* refTextField */state[/* refTextField */5]
+                                ],
+                                (function (self) {
+                                    setTimeout((function () {
+                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(6, [lane$1]));
+                                          }), 1000);
+                                    return /* () */0;
+                                  })
+                              ]);
+                  case 6 : 
+                      var lane$2 = action[0];
                       var remainingSkeletons = Helpers$ReasonScripts.filter((function (x) {
-                              return x[/* lane */1] !== lane$1;
+                              return x[/* lane */1] !== lane$2;
                             }), state[/* skeletons */2]);
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
                                   /* intervalId */state[/* intervalId */1],
                                   /* skeletons */remainingSkeletons,
                                   /* words */state[/* words */3],
-                                  /* text */state[/* text */4],
+                                  /* input */state[/* input */4],
                                   /* refTextField */state[/* refTextField */5]
                                 ]]);
                   
@@ -238,6 +351,7 @@ function make() {
 export {
   laneToInt ,
   setSectionRef ,
+  fillWords ,
   gameComponent ,
   make ,
   

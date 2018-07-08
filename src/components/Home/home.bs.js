@@ -28,12 +28,13 @@ function make() {
           /* render */(function (param) {
               return React.createElement("div", {
                           className: "Home"
-                        }, React.createElement("div", {
-                              className: "logo"
-                            }, "Skeletype"), React.createElement("img", {
+                        }, React.createElement("img", {
+                              className: "logo",
                               src: SkullMovingGif
                             }), React.createElement("div", {
-                              className: "start-button",
+                              className: "tagline"
+                            }, "Skeletype"), React.createElement("div", {
+                              className: "eightbit-btn",
                               onClick: Curry._1(param[/* handle */0], click)
                             }, "Start"));
             }),

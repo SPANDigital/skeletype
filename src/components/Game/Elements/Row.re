@@ -25,7 +25,7 @@ let getRowNumber = (~cellNo: int) : string =>
 let randomiseTile = Random.init(4);
 
 let wrapRowClass = (~cellNo: int) => {
-  let cellNo:string = getRowNumber(cellNo);
+  let cellNo: string = getRowNumber(cellNo);
   let rowType = mapRowType(cellNo);
   let row =
     switch (rowType) {
@@ -54,7 +54,11 @@ let make = (~number, _children) => {
           ReasonReact.arrayToElement(
             Array.of_list(
               List.map(
-                i => <div key={j|row-$i|j} className=(Cn.make(["cell", wrapRowClass(i)])) />,
+                i =>
+                  <div
+                    key={j|row-$i|j}
+                    className=(Cn.make(["cell", wrapRowClass(i)]))
+                  />,
                 cells,
               ),
             ),

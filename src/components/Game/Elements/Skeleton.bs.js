@@ -7,7 +7,7 @@ import * as Caml_builtin_exceptions from "bs-platform/lib/es6/caml_builtin_excep
 
 var rowComponent = ReasonReact.statelessComponent("Skeleton");
 
-function make(startTime, deathTime, time, lane, status, _) {
+function make(time, startTime, deathTime, lane, status, _) {
   return /* record */[
           /* debugName */rowComponent[/* debugName */0],
           /* reactClassInternal */rowComponent[/* reactClassInternal */1],
@@ -28,7 +28,7 @@ function make(startTime, deathTime, time, lane, status, _) {
                       Caml_builtin_exceptions.match_failure,
                       [
                         "Skeleton.re",
-                        13,
+                        14,
                         6
                       ]
                     ];
@@ -41,12 +41,12 @@ function make(startTime, deathTime, time, lane, status, _) {
                       positionFromTop = "44%";
                       break;
                   case 2 : 
-                      positionFromTop = "64%";
+                      positionFromTop = "72%";
                       break;
                   
                 }
               }
-              if (status === /* Dying */2) {
+              if (status === /* Dying */2 || status === /* Dead */3) {
                 console.log(deathTime);
                 timeString[0] = String((deathTime << 1)) + "px";
               }
@@ -55,7 +55,10 @@ function make(startTime, deathTime, time, lane, status, _) {
                                 "skeleton",
                                 /* :: */[
                                   Cn.ifTrue(status === /* Dying */2, "dying"),
-                                  /* [] */0
+                                  /* :: */[
+                                    Cn.ifTrue(status === /* Dead */3, "dead"),
+                                    /* [] */0
+                                  ]
                                 ]
                               ]),
                           style: {
