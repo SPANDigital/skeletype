@@ -23,14 +23,24 @@ type state = {
   time: int,
   intervalId: ref(option(Js.Global.intervalId)),
   skeletons: array(skeleton),
+  countdown: int,
   words: array(word),
   input: string,
   refTextField: ref(option(Dom.element)),
 };
 
+type gameState =
+  | Menu
+  | CountDown
+  | Playing
+  | Won
+  | Lost;
+
 type action =
   | Tick
   | ClearInput
+  | Countdown
+  | StartGame
   | ProcessInput(string)
   | AddWord(string, lane)
   | ReplaceWord(string, string)
@@ -38,13 +48,6 @@ type action =
   | KillSkeleton(int, lane)
   | FlagSkeletonAsDead(lane)
   | RemoveSkeleton(lane);
-
-type gameState =
-  | Menu
-  | CountDown
-  | Playing(lane)
-  | Won
-  | Lost;
 
 let laneToInt = (lane: lane) =>
   switch (lane) {
@@ -77,6 +80,7 @@ let make = _children => {
     ...gameComponent,
     initialState: () => {
       time: 0,
+      countdown: 5,
       skeletons: [||],
       words: fillWords(),
       intervalId: ref(None),
@@ -85,7 +89,12 @@ let make = _children => {
     },
     didMount: self => {
       let intervalId =
-        Some(Js.Global.setInterval(() => self.ReasonReact.send(Tick), 25));
+        Some(
+          Js.Global.setInterval(
+            () => self.ReasonReact.send(Countdown),
+            1000,
+          ),
+        );
       self.ReasonReact.state.intervalId := intervalId;
     },
     willUnmount: self =>
@@ -102,6 +111,33 @@ let make = _children => {
       },
     reducer: (action, state) =>
       switch (action) {
+      | StartGame =>
+        ReasonReact.SideEffects(
+          (
+            self => {
+              let intervalId =
+                Some(
+                  Js.Global.setInterval(
+                    () => self.ReasonReact.send(Tick),
+                    25,
+                  ),
+                );
+              self.ReasonReact.state.intervalId := intervalId;
+            }
+          ),
+        )
+
+      | Countdown =>
+        ReasonReact.UpdateWithSideEffects(
+          {...state, countdown: state.countdown - 1},
+          (
+            self =>
+              if (self.state.countdown === 0) {
+                self.send(StartGame);
+              }
+          ),
+        )
+
       | Tick =>
         ReasonReact.UpdateWithSideEffects(
           {...state, time: state.time + 1},
@@ -117,16 +153,21 @@ let make = _children => {
                 if (state.time mod 100 === 0) {
                   let occupiedLanes =
                     ArrayLabels.map(s => s.lane, state.skeletons);
-                  
-                  let deployedLane = ref(Top); 
+
+                  let deployedLane = ref(Top);
 
                   if (Array.length(occupiedLanes) !== 3) {
-                    if (!Helpers.contains(Top, occupiedLanes)) {deployedLane := Top};
-                    if (!Helpers.contains(Middle, occupiedLanes)) {deployedLane := Middle};
-                    if (!Helpers.contains(Bottom, occupiedLanes)) {deployedLane := Bottom};
+                    if (! Helpers.contains(Top, occupiedLanes)) {
+                      deployedLane := Top;
+                    };
+                    if (! Helpers.contains(Middle, occupiedLanes)) {
+                      deployedLane := Middle;
+                    };
+                    if (! Helpers.contains(Bottom, occupiedLanes)) {
+                      deployedLane := Bottom;
+                    };
                     self.send(SpawnSkeleton(state.time, deployedLane^));
                   };
-            
                 };
               }
           ),
@@ -148,7 +189,9 @@ let make = _children => {
                   let targetWord = matchedWord[0].randomWord;
                   let targetLane = matchedWord[0].wordLane;
 
-                  self.send(ReplaceWord(targetWord, Dictionary.getRandomWord()));
+                  self.send(
+                    ReplaceWord(targetWord, Dictionary.getRandomWord()),
+                  );
                   self.send(KillSkeleton(self.state.time, targetLane));
                   self.send(ClearInput);
                 };
@@ -197,7 +240,7 @@ let make = _children => {
           {...state, skeletons: state.skeletons},
           (
             self => {
-                setTimeout(() => self.send(FlagSkeletonAsDead(lane)), 1000);
+              setTimeout(() => self.send(FlagSkeletonAsDead(lane)), 1000);
               ();
             }
           ),
@@ -205,12 +248,12 @@ let make = _children => {
 
       | FlagSkeletonAsDead(lane) =>
         let skeleton = Helpers.find(~f=x => x.lane === lane, state.skeletons);
-        skeleton.status = Dead; 
+        skeleton.status = Dead;
         ReasonReact.UpdateWithSideEffects(
           {...state, skeletons: state.skeletons},
           (
             self => {
-                setTimeout(() => self.send(RemoveSkeleton(lane)), 1000);
+              setTimeout(() => self.send(RemoveSkeleton(lane)), 1000);
               ();
             }
           ),
@@ -220,16 +263,26 @@ let make = _children => {
         let remainingSkeletons =
           Helpers.filter(~f=x => x.lane !== lane, state.skeletons);
         ReasonReact.Update({...state, skeletons: remainingSkeletons});
-        
       },
     render: ({state, handle, send}) => {
       let {time, input, skeletons, words, _} = state;
       <div className="world">
         <div className="layout">
+          <div
+            className=(
+              Cn.make([
+                "countdown",
+                "done" |> Cn.ifTrue(state.countdown <= 0),
+              ])
+            )>
+            (ReasonReact.string(string_of_int(state.countdown)))
+          </div>
           <div className="header">
-            <div className="begging">(ReasonReact.string("SKELETYPE"))</div>
-            <div className="middle">(ReasonReact.string(string_of_int(time)))</div>
-            <div className="end">(ReasonReact.string("X"))</div>
+            <div className="begging"> (ReasonReact.string("SKELETYPE")) </div>
+            <div className="middle">
+              (ReasonReact.string(string_of_int(time)))
+            </div>
+            <div className="end"> (ReasonReact.string("X")) </div>
           </div>
           <div className="menu">
             (
