@@ -5,7 +5,6 @@ let make = (~randomWord, ~input as text, _children) => {
     let normalWord = ref(randomWord);
     let matchedWord = ref(text);
     if (text !== "" && Js.String.startsWith(text, randomWord)) {
-      Js.log(randomWord);
       matchedWord := text;
       normalWord := Js.String.split(text, randomWord)[1];
     } else {

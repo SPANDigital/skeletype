@@ -4,10 +4,28 @@ import * as Cn from "re-classnames/src/Cn.bs.js";
 import * as React from "react";
 import * as ReasonReact from "reason-react/src/ReasonReact.js";
 import * as Caml_builtin_exceptions from "bs-platform/lib/es6/caml_builtin_exceptions.js";
+import * as Undead_deadGif from "../../../assets/undead/undead_dead.gif";
+import * as Undead_walkGif from "../../../assets/undead/undead_walk.gif";
+import * as Undead_deathGif from "../../../assets/undead/undead_death.gif";
+import * as Undead_attackGif from "../../../assets/undead/undead_attack.gif";
+
+function statusToString(status) {
+  switch (status) {
+    case 0 : 
+        return "Walking";
+    case 1 : 
+        return "Attacking";
+    case 2 : 
+        return "Dying";
+    case 3 : 
+        return "Dead";
+    
+  }
+}
 
 var rowComponent = ReasonReact.statelessComponent("Skeleton");
 
-function make(time, startTime, deathTime, lane, status, _) {
+function make(time, startTime, stopTime, lane, status, _) {
   return /* record */[
           /* debugName */rowComponent[/* debugName */0],
           /* reactClassInternal */rowComponent[/* reactClassInternal */1],
@@ -19,8 +37,21 @@ function make(time, startTime, deathTime, lane, status, _) {
           /* willUpdate */rowComponent[/* willUpdate */7],
           /* shouldUpdate */rowComponent[/* shouldUpdate */8],
           /* render */(function () {
-              var startPosition = time - startTime | 0;
-              var timeString = [String((startPosition << 1)) + "px"];
+              var progress = time - startTime | 0;
+              var timeString = [String((progress << 1)) + "px"];
+              var determineGif = function (status) {
+                switch (status) {
+                  case 0 : 
+                      return "url(" + (String(Undead_walkGif) + ")");
+                  case 1 : 
+                      return "url(" + (String(Undead_attackGif) + ")");
+                  case 2 : 
+                      return "url(" + (String(Undead_deathGif) + ")");
+                  case 3 : 
+                      return "url(" + (String(Undead_deadGif) + ")");
+                  
+                }
+              };
               var switcher = lane - 1 | 0;
               var positionFromTop;
               if (switcher > 2 || switcher < 0) {
@@ -28,7 +59,7 @@ function make(time, startTime, deathTime, lane, status, _) {
                       Caml_builtin_exceptions.match_failure,
                       [
                         "Skeleton.re",
-                        14,
+                        42,
                         6
                       ]
                     ];
@@ -46,9 +77,8 @@ function make(time, startTime, deathTime, lane, status, _) {
                   
                 }
               }
-              if (status === /* Dying */2 || status === /* Dead */3) {
-                console.log(deathTime);
-                timeString[0] = String((deathTime << 1)) + "px";
+              if (status === /* Dying */2 || status === /* Dead */3 || status === /* Attacking */1) {
+                timeString[0] = String((stopTime << 1)) + "px";
               }
               return React.createElement("div", {
                           className: Cn.make(/* :: */[
@@ -62,6 +92,7 @@ function make(time, startTime, deathTime, lane, status, _) {
                                 ]
                               ]),
                           style: {
+                            backgroundImage: determineGif(status),
                             top: positionFromTop,
                             transform: "translateX(" + (String(timeString) + ")")
                           }
@@ -76,6 +107,7 @@ function make(time, startTime, deathTime, lane, status, _) {
 }
 
 export {
+  statusToString ,
   rowComponent ,
   make ,
   

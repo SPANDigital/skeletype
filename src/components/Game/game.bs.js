@@ -8,11 +8,14 @@ import * as React from "react";
 import * as Caml_array from "bs-platform/lib/es6/caml_array.js";
 import * as ArrayLabels from "bs-platform/lib/es6/arrayLabels.js";
 import * as ReasonReact from "reason-react/src/ReasonReact.js";
+import * as Fog$ReasonScripts from "./Elements/Fog/Fog.bs.js";
 import * as Row$ReasonScripts from "./Elements/Row.bs.js";
 import * as Word$ReasonScripts from "./Elements/Word.bs.js";
 import * as Helpers$ReasonScripts from "../../utils/Helpers.bs.js";
 import * as Skeleton$ReasonScripts from "./Elements/Skeleton.bs.js";
-import * as Dictionary$ReasonScripts from "./Elements/Dictionary.bs.js";
+import * as Caml_builtin_exceptions from "bs-platform/lib/es6/caml_builtin_exceptions.js";
+import * as Dictionary$ReasonScripts from "./Elements/Services/Dictionary.bs.js";
+import * as BitHeartPng from "../../assets/8-bit-heart.png";
 
 ((require('./game.css')));
 
@@ -21,7 +24,7 @@ function laneToInt(lane) {
 }
 
 function setSectionRef(theRef, param) {
-  param[/* state */1][/* refTextField */6][0] = (theRef == null) ? /* None */0 : [theRef];
+  param[/* state */1][/* refTextField */9][0] = (theRef == null) ? /* None */0 : [theRef];
   return /* () */0;
 }
 
@@ -57,11 +60,11 @@ function make() {
               var intervalId = /* Some */[setInterval((function () {
                         return Curry._1(self[/* send */3], /* Countdown */2);
                       }), 1000)];
-              self[/* state */1][/* intervalId */1][0] = intervalId;
+              self[/* state */1][/* intervalId */8][0] = intervalId;
               return /* () */0;
             }),
           /* didUpdate */(function (param) {
-              var match = param[/* newSelf */1][/* state */1][/* refTextField */6][0];
+              var match = param[/* newSelf */1][/* state */1][/* refTextField */9][0];
               if (match) {
                 match[0].focus();
                 return /* () */0;
@@ -70,7 +73,7 @@ function make() {
               }
             }),
           /* willUnmount */(function (self) {
-              var match = self[/* state */1][/* intervalId */1][0];
+              var match = self[/* state */1][/* intervalId */8][0];
               if (match) {
                 clearInterval(match[0]);
                 return /* () */0;
@@ -82,42 +85,59 @@ function make() {
           /* shouldUpdate */gameComponent[/* shouldUpdate */8],
           /* render */(function (param) {
               var state = param[/* state */1];
-              var input = state[/* input */5];
+              var input = state[/* input */4];
               var time = state[/* time */0];
               var send = param[/* send */3];
               return React.createElement("div", {
                           className: "world"
-                        }, React.createElement("div", {
+                        }, ReasonReact.element(/* None */0, /* None */0, Fog$ReasonScripts.make(/* array */[])), React.createElement("div", {
                               className: "layout"
                             }, React.createElement("div", {
                                   className: Cn.make(/* :: */[
                                         "countdown",
                                         /* :: */[
-                                          Cn.ifTrue(state[/* countdown */3] <= 0, "done"),
+                                          Cn.ifTrue(state[/* countdown */5] <= 0, "done"),
                                           /* [] */0
                                         ]
                                       ])
-                                }, String(state[/* countdown */3])), React.createElement("div", {
+                                }, String(state[/* countdown */5])), React.createElement("div", {
+                                  className: Cn.make(/* :: */[
+                                        "youDied",
+                                        /* :: */[
+                                          Cn.ifTrue(state[/* lives */3] <= 0, "show"),
+                                          /* [] */0
+                                        ]
+                                      ])
+                                }, "YOU DIED"), React.createElement("div", {
                                   className: "header"
                                 }, React.createElement("div", {
-                                      className: "begging"
+                                      className: "beginning"
                                     }, "SKELETYPE"), React.createElement("div", {
                                       className: "middle"
-                                    }, String(time)), React.createElement("div", {
+                                    }, React.createElement("div", {
+                                          className: "killed"
+                                        }, "Killed:" + String(state[/* killed */2])), React.createElement("div", {
+                                          className: "time"
+                                        }, React.createElement("img", {
+                                              className: "heart",
+                                              src: BitHeartPng
+                                            }), "(" + (String(state[/* lives */3]) + ")")), React.createElement("div", {
+                                          className: "score"
+                                        }, "Score:" + String(state[/* score */1]))), React.createElement("div", {
                                       className: "end"
-                                    }, "X")), React.createElement("div", {
+                                    })), React.createElement("div", {
                                   className: "menu"
                                 }, $$Array.mapi((function (_, word) {
                                         return ReasonReact.element(/* None */0, /* None */0, Word$ReasonScripts.make(word[/* randomWord */0], input, /* array */[]));
-                                      }), state[/* words */4])), React.createElement("div", {
+                                      }), state[/* words */6])), React.createElement("div", {
                                   className: "content"
                                 }, $$Array.mapi((function (i, skeleton) {
-                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(time, skeleton[/* startTime */0], skeleton[/* deathTime */2], skeleton[/* lane */1] + 1 | 0, skeleton[/* status */3], /* array */[]));
-                                      }), state[/* skeletons */2]), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
+                                        return ReasonReact.element(/* Some */["skeleton-" + (String(i) + "")], /* None */0, Skeleton$ReasonScripts.make(time, skeleton[/* startTime */0], skeleton[/* stopTime */3], skeleton[/* lane */1] + 1 | 0, skeleton[/* status */4], /* array */[]));
+                                      }), state[/* skeletons */7]), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("1", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("2", /* array */[])), ReasonReact.element(/* None */0, /* None */0, Row$ReasonScripts.make("3", /* array */[]))), React.createElement("div", {
                                   className: "footer"
                                 }, React.createElement("input", {
                                       ref: Curry._1(param[/* handle */0], setSectionRef),
-                                      value: state[/* input */5],
+                                      value: state[/* input */4],
                                       onChange: (function ($$event) {
                                           return Curry._1(send, /* ProcessInput */Block.__(0, [$$event.target.value]));
                                         })
@@ -126,11 +146,14 @@ function make() {
           /* initialState */(function () {
               return /* record */[
                       /* time */0,
-                      /* intervalId */[/* None */0],
-                      /* skeletons : array */[],
-                      /* countdown */5,
-                      /* words */fillWords(/* () */0),
+                      /* score */0,
+                      /* killed */0,
+                      /* lives */10,
                       /* input */"",
+                      /* countdown */1,
+                      /* words */fillWords(/* () */0),
+                      /* skeletons : array */[],
+                      /* intervalId */[/* None */0],
                       /* refTextField */[/* None */0]
                     ];
             }),
@@ -142,23 +165,27 @@ function make() {
                       return /* UpdateWithSideEffects */Block.__(2, [
                                 /* record */[
                                   /* time */state[/* time */0] + 1 | 0,
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ],
                                 (function (self) {
-                                    if (state[/* time */0] === 0) {
-                                      return Curry._1(self[/* send */3], /* SpawnSkeleton */Block.__(3, [
-                                                    state[/* time */0],
-                                                    /* Top */0
-                                                  ]));
-                                    } else if (state[/* time */0] % 100 === 0) {
+                                    var skeletonsCurrentlyAttacking = Helpers$ReasonScripts.filter((function (x) {
+                                            return (self[/* state */1][/* time */0] - x[/* startTime */0] | 0) === 400;
+                                          }), state[/* skeletons */7]);
+                                    $$Array.mapi((function (_, skeleton) {
+                                            return Curry._1(self[/* send */3], /* FlagSkeletonAsAttacking */Block.__(5, [skeleton]));
+                                          }), skeletonsCurrentlyAttacking);
+                                    if (state[/* time */0] % 100 === 0) {
                                       var occupiedLanes = ArrayLabels.map((function (s) {
                                               return s[/* lane */1];
-                                            }), state[/* skeletons */2]);
+                                            }), state[/* skeletons */7]);
                                       var deployedLane = /* Top */0;
                                       if (occupiedLanes.length !== 3) {
                                         if (!Helpers$ReasonScripts.contains(/* Top */0, occupiedLanes)) {
@@ -185,26 +212,32 @@ function make() {
                   case 1 : 
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
                                   /* input */"",
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ]]);
                   case 2 : 
                       return /* UpdateWithSideEffects */Block.__(2, [
                                 /* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3] - 1 | 0,
-                                  /* words */state[/* words */4],
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5] - 1 | 0,
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ],
                                 (function (self) {
-                                    if (self[/* state */1][/* countdown */3] === 0) {
+                                    if (self[/* state */1][/* countdown */5] === 0) {
                                       return Curry._1(self[/* send */3], /* StartGame */3);
                                     } else {
                                       return 0;
@@ -216,9 +249,22 @@ function make() {
                                     var intervalId = /* Some */[setInterval((function () {
                                               return Curry._1(self[/* send */3], /* Tick */0);
                                             }), 25)];
-                                    self[/* state */1][/* intervalId */1][0] = intervalId;
+                                    self[/* state */1][/* intervalId */8][0] = intervalId;
                                     return /* () */0;
                                   })]);
+                  case 4 : 
+                      return /* Update */Block.__(0, [/* record */[
+                                  /* time */state[/* time */0],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3] - 1 | 0,
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
+                                ]]);
                   
                 }
               } else {
@@ -227,18 +273,21 @@ function make() {
                       return /* UpdateWithSideEffects */Block.__(2, [
                                 /* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
                                   /* input */action[0],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ],
                                 (function (self) {
-                                    if (self[/* state */1][/* input */5].length > 0) {
+                                    if (self[/* state */1][/* input */4].length > 0) {
                                       var matchedWord = Helpers$ReasonScripts.filter((function (x) {
-                                              return x[/* randomWord */0] === self[/* state */1][/* input */5];
-                                            }), state[/* words */4]);
+                                              return x[/* randomWord */0] === self[/* state */1][/* input */4];
+                                            }), state[/* words */6]);
                                       if (matchedWord.length) {
                                         var targetWord = Caml_array.caml_array_get(matchedWord, 0)[/* randomWord */0];
                                         var targetLane = Caml_array.caml_array_get(matchedWord, 0)[/* wordLane */1];
@@ -265,7 +314,7 @@ function make() {
                         /* randomWord */action[0],
                         /* wordLane */wordLane
                       ];
-                      var existingWords = state[/* words */4];
+                      var existingWords = state[/* words */6];
                       switch (wordLane) {
                         case 0 : 
                             Caml_array.caml_array_set(existingWords, 0, word);
@@ -280,16 +329,19 @@ function make() {
                       }
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
                                   /* words */existingWords,
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ]]);
                   case 2 : 
                       var oldWord = action[0];
-                      var updatedWords = state[/* words */4];
+                      var updatedWords = state[/* words */6];
                       if (updatedWords.length) {
                         var entryToReplace = Helpers$ReasonScripts.find((function (x) {
                                 return x[/* randomWord */0] === oldWord;
@@ -298,94 +350,189 @@ function make() {
                       }
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
+                                  /* score */state[/* score */1] + 10 | 0,
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
                                   /* words */updatedWords,
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ]]);
                   case 3 : 
                       var skeleton = /* record */[
                         /* startTime */action[0],
                         /* lane */action[1],
-                        /* deathTime */0,
+                        /* intervalId */[/* None */0],
+                        /* stopTime */0,
                         /* status : Walking */0
                       ];
-                      var existingSkeletons = ArrayLabels.to_list(state[/* skeletons */2]);
+                      var existingSkeletons = ArrayLabels.to_list(state[/* skeletons */7]);
                       var updatedSkeletons = ArrayLabels.of_list(/* :: */[
                             skeleton,
                             existingSkeletons
                           ]);
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
                                   /* skeletons */updatedSkeletons,
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ]]);
                   case 4 : 
                       var lane = action[1];
-                      var skeleton$1 = Helpers$ReasonScripts.find((function (x) {
-                              return x[/* lane */1] === lane;
-                            }), state[/* skeletons */2]);
-                      skeleton$1[/* status */3] = /* Dying */2;
-                      skeleton$1[/* deathTime */2] = state[/* time */0] - skeleton$1[/* startTime */0] | 0;
-                      return /* UpdateWithSideEffects */Block.__(2, [
-                                /* record */[
-                                  /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
-                                ],
-                                (function (self) {
-                                    setTimeout((function () {
-                                            return Curry._1(self[/* send */3], /* FlagSkeletonAsDead */Block.__(5, [lane]));
-                                          }), 1000);
-                                    return /* () */0;
-                                  })
-                              ]);
+                      var exit = 0;
+                      var skeleton$1;
+                      try {
+                        skeleton$1 = Helpers$ReasonScripts.find((function (x) {
+                                return x[/* lane */1] === lane;
+                              }), state[/* skeletons */7]);
+                        exit = 1;
+                      }
+                      catch (exn){
+                        if (exn === Caml_builtin_exceptions.not_found) {
+                          return /* NoUpdate */0;
+                        } else {
+                          throw exn;
+                        }
+                      }
+                      if (exit === 1) {
+                        var skeleton$2 = skeleton$1;
+                        if (skeleton$2[/* status */4] === /* Walking */0) {
+                          skeleton$2[/* stopTime */3] = state[/* time */0] - skeleton$2[/* startTime */0] | 0;
+                        }
+                        skeleton$2[/* status */4] = /* Dying */2;
+                        return /* UpdateWithSideEffects */Block.__(2, [
+                                  /* record */[
+                                    /* time */state[/* time */0],
+                                    /* score */state[/* score */1] + 50 | 0,
+                                    /* killed */state[/* killed */2] + 1 | 0,
+                                    /* lives */state[/* lives */3],
+                                    /* input */state[/* input */4],
+                                    /* countdown */state[/* countdown */5],
+                                    /* words */state[/* words */6],
+                                    /* skeletons */state[/* skeletons */7],
+                                    /* intervalId */state[/* intervalId */8],
+                                    /* refTextField */state[/* refTextField */9]
+                                  ],
+                                  (function (self) {
+                                      setTimeout((function () {
+                                              return Curry._1(self[/* send */3], /* FlagSkeletonAsDead */Block.__(6, [lane]));
+                                            }), 1000);
+                                      return /* () */0;
+                                    })
+                                ]);
+                      }
+                      break;
                   case 5 : 
-                      var lane$1 = action[0];
-                      var skeleton$2 = Helpers$ReasonScripts.find((function (x) {
-                              return x[/* lane */1] === lane$1;
-                            }), state[/* skeletons */2]);
-                      skeleton$2[/* status */3] = /* Dead */3;
+                      var skeleton$3 = action[0];
+                      skeleton$3[/* status */4] = /* Attacking */1;
+                      skeleton$3[/* stopTime */3] = state[/* time */0] - skeleton$3[/* startTime */0] | 0;
                       return /* UpdateWithSideEffects */Block.__(2, [
                                 /* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
-                                  /* skeletons */state[/* skeletons */2],
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ],
                                 (function (self) {
-                                    setTimeout((function () {
-                                            return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(6, [lane$1]));
-                                          }), 1000);
-                                    return /* () */0;
+                                    var intervalId = /* Some */[setInterval((function () {
+                                              return Curry._1(self[/* send */3], /* DamagePlayer */4);
+                                            }), 1000)];
+                                    return Curry._1(self[/* send */3], /* SetSkeletonInterval */Block.__(8, [
+                                                  skeleton$3,
+                                                  intervalId
+                                                ]));
                                   })
                               ]);
                   case 6 : 
+                      var lane$1 = action[0];
+                      var exit$1 = 0;
+                      var skeleton$4;
+                      try {
+                        skeleton$4 = Helpers$ReasonScripts.find((function (x) {
+                                return x[/* lane */1] === lane$1;
+                              }), state[/* skeletons */7]);
+                        exit$1 = 1;
+                      }
+                      catch (exn$1){
+                        if (exn$1 === Caml_builtin_exceptions.not_found) {
+                          return /* NoUpdate */0;
+                        } else {
+                          throw exn$1;
+                        }
+                      }
+                      if (exit$1 === 1) {
+                        var skeleton$5 = skeleton$4;
+                        skeleton$5[/* status */4] = /* Dead */3;
+                        var match = skeleton$5[/* intervalId */2][0];
+                        if (match) {
+                          clearInterval(match[0]);
+                        }
+                        return /* UpdateWithSideEffects */Block.__(2, [
+                                  /* record */[
+                                    /* time */state[/* time */0],
+                                    /* score */state[/* score */1],
+                                    /* killed */state[/* killed */2],
+                                    /* lives */state[/* lives */3],
+                                    /* input */state[/* input */4],
+                                    /* countdown */state[/* countdown */5],
+                                    /* words */state[/* words */6],
+                                    /* skeletons */state[/* skeletons */7],
+                                    /* intervalId */state[/* intervalId */8],
+                                    /* refTextField */state[/* refTextField */9]
+                                  ],
+                                  (function (self) {
+                                      setTimeout((function () {
+                                              return Curry._1(self[/* send */3], /* RemoveSkeleton */Block.__(7, [lane$1]));
+                                            }), 1000);
+                                      return /* () */0;
+                                    })
+                                ]);
+                      }
+                      break;
+                  case 7 : 
                       var lane$2 = action[0];
                       var remainingSkeletons = Helpers$ReasonScripts.filter((function (x) {
                               return x[/* lane */1] !== lane$2;
-                            }), state[/* skeletons */2]);
+                            }), state[/* skeletons */7]);
                       return /* Update */Block.__(0, [/* record */[
                                   /* time */state[/* time */0],
-                                  /* intervalId */state[/* intervalId */1],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
                                   /* skeletons */remainingSkeletons,
-                                  /* countdown */state[/* countdown */3],
-                                  /* words */state[/* words */4],
-                                  /* input */state[/* input */5],
-                                  /* refTextField */state[/* refTextField */6]
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
+                                ]]);
+                  case 8 : 
+                      action[0][/* intervalId */2][0] = action[1];
+                      return /* Update */Block.__(0, [/* record */[
+                                  /* time */state[/* time */0],
+                                  /* score */state[/* score */1],
+                                  /* killed */state[/* killed */2],
+                                  /* lives */state[/* lives */3],
+                                  /* input */state[/* input */4],
+                                  /* countdown */state[/* countdown */5],
+                                  /* words */state[/* words */6],
+                                  /* skeletons */state[/* skeletons */7],
+                                  /* intervalId */state[/* intervalId */8],
+                                  /* refTextField */state[/* refTextField */9]
                                 ]]);
                   
                 }

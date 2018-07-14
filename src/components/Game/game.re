@@ -1,6 +1,10 @@
 [%bs.raw {|require('./game.css')|}];
 [@bs.val] external setTimeout : (unit => unit, int) => float = "setTimeout";
 [@bs.val] external clearTimeout : float => unit = "clearTimeout";
+[@bs.val] external setInterval : (unit => unit, int) => float = "setInterval";
+[@bs.val] external clearInterval : float => unit = "clearInterval";
+
+[@bs.module] external heartIcon : string = "../../assets/8-bit-heart.png";
 
 type lane =
   | Top
@@ -10,7 +14,8 @@ type lane =
 type skeleton = {
   startTime: int,
   lane,
-  mutable deathTime: int,
+  intervalId: ref(option(float)),
+  mutable stopTime: int,
   mutable status: Skeleton.status,
 };
 
@@ -21,11 +26,14 @@ type word = {
 
 type state = {
   time: int,
-  intervalId: ref(option(Js.Global.intervalId)),
-  skeletons: array(skeleton),
+  score: int,
+  killed: int,
+  lives: int,
+  input: string,
   countdown: int,
   words: array(word),
-  input: string,
+  skeletons: array(skeleton),
+  intervalId: ref(option(float)),
   refTextField: ref(option(Dom.element)),
 };
 
@@ -41,13 +49,16 @@ type action =
   | ClearInput
   | Countdown
   | StartGame
+  | DamagePlayer
   | ProcessInput(string)
   | AddWord(string, lane)
   | ReplaceWord(string, string)
   | SpawnSkeleton(int, lane)
   | KillSkeleton(int, lane)
+  | FlagSkeletonAsAttacking(skeleton)
   | FlagSkeletonAsDead(lane)
-  | RemoveSkeleton(lane);
+  | RemoveSkeleton(lane)
+  | SetSkeletonInterval(skeleton, option(float));
 
 let laneToInt = (lane: lane) =>
   switch (lane) {
@@ -80,26 +91,24 @@ let make = _children => {
     ...gameComponent,
     initialState: () => {
       time: 0,
-      countdown: 5,
+      score: 0,
+      killed: 0,
+      lives: 10,
+      countdown: 1,
+      input: "",
       skeletons: [||],
       words: fillWords(),
       intervalId: ref(None),
       refTextField: ref(None),
-      input: "",
     },
     didMount: self => {
       let intervalId =
-        Some(
-          Js.Global.setInterval(
-            () => self.ReasonReact.send(Countdown),
-            1000,
-          ),
-        );
+        Some(setInterval(() => self.ReasonReact.send(Countdown), 1000));
       self.ReasonReact.state.intervalId := intervalId;
     },
     willUnmount: self =>
       switch (self.state.intervalId^) {
-      | Some(id) => Js.Global.clearInterval(id)
+      | Some(id) => clearInterval(id)
       | None => ()
       },
     didUpdate: ({oldSelf, newSelf}) =>
@@ -116,12 +125,7 @@ let make = _children => {
           (
             self => {
               let intervalId =
-                Some(
-                  Js.Global.setInterval(
-                    () => self.ReasonReact.send(Tick),
-                    25,
-                  ),
-                );
+                Some(setInterval(() => self.ReasonReact.send(Tick), 25));
               self.ReasonReact.state.intervalId := intervalId;
             }
           ),
@@ -142,34 +146,40 @@ let make = _children => {
         ReasonReact.UpdateWithSideEffects(
           {...state, time: state.time + 1},
           (
-            self =>
-              /* Game has started */
-              if (state.time === 0) {
-                self.send(SpawnSkeleton(state.time, Top));
-              } else {
-                let lastArrayIndex = Array.length(state.skeletons) - 1;
+            self => {
+              let skeletonsCurrentlyAttacking =
+                Helpers.filter(
+                  ~f=x => self.state.time - x.startTime === 400,
+                  state.skeletons,
+                );
 
-                /* Every 100ms */
-                if (state.time mod 100 === 0) {
-                  let occupiedLanes =
-                    ArrayLabels.map(s => s.lane, state.skeletons);
+              Array.mapi(
+                (i, skeleton) =>
+                  self.send(FlagSkeletonAsAttacking(skeleton)),
+                skeletonsCurrentlyAttacking,
+              );
 
-                  let deployedLane = ref(Top);
+              /* Every 100ms */
+              if (state.time mod 100 === 0) {
+                let occupiedLanes =
+                  ArrayLabels.map(s => s.lane, state.skeletons);
 
-                  if (Array.length(occupiedLanes) !== 3) {
-                    if (! Helpers.contains(Top, occupiedLanes)) {
-                      deployedLane := Top;
-                    };
-                    if (! Helpers.contains(Middle, occupiedLanes)) {
-                      deployedLane := Middle;
-                    };
-                    if (! Helpers.contains(Bottom, occupiedLanes)) {
-                      deployedLane := Bottom;
-                    };
-                    self.send(SpawnSkeleton(state.time, deployedLane^));
+                let deployedLane = ref(Top);
+
+                if (Array.length(occupiedLanes) !== 3) {
+                  if (! Helpers.contains(Top, occupiedLanes)) {
+                    deployedLane := Top;
                   };
+                  if (! Helpers.contains(Middle, occupiedLanes)) {
+                    deployedLane := Middle;
+                  };
+                  if (! Helpers.contains(Bottom, occupiedLanes)) {
+                    deployedLane := Bottom;
+                  };
+                  self.send(SpawnSkeleton(state.time, deployedLane^));
                 };
-              }
+              };
+            }
           ),
         )
 
@@ -218,12 +228,17 @@ let make = _children => {
             Helpers.find(~f=x => x.randomWord === oldWord, updatedWords);
           entryToReplace.randomWord = newWord;
         };
-        ReasonReact.Update({...state, words: updatedWords});
+        ReasonReact.Update({
+          ...state,
+          words: updatedWords,
+          score: state.score + 10,
+        });
 
       | SpawnSkeleton(startTime, lane) =>
         let skeleton: skeleton = {
+          intervalId: ref(None),
           startTime,
-          deathTime: 0,
+          stopTime: 0,
           lane,
           status: Walking,
         };
@@ -232,41 +247,87 @@ let make = _children => {
           [skeleton, ...existingSkeletons] |> ArrayLabels.of_list;
         ReasonReact.Update({...state, skeletons: updatedSkeletons});
 
-      | KillSkeleton(deathTime, lane) =>
-        let skeleton = Helpers.find(~f=x => x.lane === lane, state.skeletons);
-        skeleton.status = Dying;
-        skeleton.deathTime = state.time - skeleton.startTime;
+      | KillSkeleton(stopTime, lane) =>
+        let killIt = skeleton => {
+          if (skeleton.status === Walking) {
+            skeleton.stopTime = state.time - skeleton.startTime;
+          };
+          skeleton.status = Dying;
+          ReasonReact.UpdateWithSideEffects(
+            {
+              ...state,
+              killed: state.killed + 1,
+              skeletons: state.skeletons,
+              score: state.score + 50,
+            },
+            (
+              self => {
+                setTimeout(() => self.send(FlagSkeletonAsDead(lane)), 1000);
+                ();
+              }
+            ),
+          );
+        };
+
+        switch (Helpers.find(~f=x => x.lane === lane, state.skeletons)) {
+        | skeleton => killIt(skeleton)
+        | exception Not_found => ReasonReact.NoUpdate
+        };
+
+      | FlagSkeletonAsAttacking(skeleton) =>
+        skeleton.status = Attacking;
+        skeleton.stopTime = state.time - skeleton.startTime;
+
         ReasonReact.UpdateWithSideEffects(
           {...state, skeletons: state.skeletons},
           (
             self => {
-              setTimeout(() => self.send(FlagSkeletonAsDead(lane)), 1000);
-              ();
+              let intervalId =
+                Some(setInterval(() => self.send(DamagePlayer), 1000));
+              self.send(SetSkeletonInterval(skeleton, intervalId));
             }
           ),
         );
 
+      | SetSkeletonInterval(skeleton, intervalId) =>
+        skeleton.intervalId := intervalId;
+        ReasonReact.Update({...state, skeletons: state.skeletons});
+
       | FlagSkeletonAsDead(lane) =>
-        let skeleton = Helpers.find(~f=x => x.lane === lane, state.skeletons);
-        skeleton.status = Dead;
-        ReasonReact.UpdateWithSideEffects(
-          {...state, skeletons: state.skeletons},
-          (
-            self => {
-              setTimeout(() => self.send(RemoveSkeleton(lane)), 1000);
-              ();
-            }
-          ),
-        );
+        let flagIt = skeleton => {
+          skeleton.status = Dead;
+          switch (skeleton.intervalId^) {
+          | Some(float) => clearInterval(float)
+          | None => ()
+          };
+
+          ReasonReact.UpdateWithSideEffects(
+            {...state, skeletons: state.skeletons},
+            (
+              self => {
+                setTimeout(() => self.send(RemoveSkeleton(lane)), 1000);
+                ();
+              }
+            ),
+          );
+        };
+
+        switch (Helpers.find(~f=x => x.lane === lane, state.skeletons)) {
+        | skeleton => flagIt(skeleton)
+        | exception Not_found => ReasonReact.NoUpdate
+        };
 
       | RemoveSkeleton(lane) =>
         let remainingSkeletons =
           Helpers.filter(~f=x => x.lane !== lane, state.skeletons);
         ReasonReact.Update({...state, skeletons: remainingSkeletons});
+
+      | DamagePlayer => ReasonReact.Update({...state, lives: state.lives - 1})
       },
     render: ({state, handle, send}) => {
-      let {time, input, skeletons, words, _} = state;
+      let {time, input, lives, skeletons, score, killed, words, _} = state;
       <div className="world">
+        <Fog />
         <div className="layout">
           <div
             className=(
@@ -277,12 +338,29 @@ let make = _children => {
             )>
             (ReasonReact.string(string_of_int(state.countdown)))
           </div>
+          <div
+            className=(
+              Cn.make(["youDied", "show" |> Cn.ifTrue(state.lives <= 0)])
+            )>
+            (ReasonReact.string("YOU DIED"))
+          </div>
           <div className="header">
-            <div className="begging"> (ReasonReact.string("SKELETYPE")) </div>
-            <div className="middle">
-              (ReasonReact.string(string_of_int(time)))
+            <div className="beginning">
+              (ReasonReact.string("SKELETYPE"))
             </div>
-            <div className="end"> (ReasonReact.string("X")) </div>
+            <div className="middle">
+              <div className="killed">
+                (ReasonReact.string("Killed:" ++ string_of_int(killed)))
+              </div>
+              <div className="time">
+                <img className="heart" src=heartIcon />
+                (ReasonReact.string("(" ++ string_of_int(lives) ++ ")"))
+              </div>
+              <div className="score">
+                (ReasonReact.string("Score:" ++ string_of_int(score)))
+              </div>
+            </div>
+            <div className="end" />
           </div>
           <div className="menu">
             (
@@ -303,7 +381,7 @@ let make = _children => {
                       key={j|skeleton-$i|j}
                       lane=(laneToInt(skeleton.lane))
                       startTime=skeleton.startTime
-                      deathTime=skeleton.deathTime
+                      stopTime=skeleton.stopTime
                       status=skeleton.status
                       time
                     />,
