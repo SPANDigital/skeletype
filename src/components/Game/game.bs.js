@@ -14,8 +14,9 @@ import * as Word$ReasonScripts from "./Elements/Word.bs.js";
 import * as Helpers$ReasonScripts from "../../utils/Helpers.bs.js";
 import * as Skeleton$ReasonScripts from "./Elements/Skeleton.bs.js";
 import * as Caml_builtin_exceptions from "bs-platform/lib/es6/caml_builtin_exceptions.js";
-import * as Dictionary$ReasonScripts from "./Elements/Services/Dictionary.bs.js";
+import * as Dictionary$ReasonScripts from "./Services/Dictionary.bs.js";
 import * as BitHeartPng from "../../assets/8-bit-heart.png";
+import * as Undead_idleGif from "../../assets/undead/undead_idle.gif";
 
 ((require('./game.css')));
 
@@ -116,10 +117,13 @@ function make() {
                                       className: "middle"
                                     }, React.createElement("div", {
                                           className: "killed"
-                                        }, "Killed:" + String(state[/* killed */2])), React.createElement("div", {
+                                        }, React.createElement("img", {
+                                              className: "skeletonIcon",
+                                              src: Undead_idleGif
+                                            }), "(" + (String(state[/* killed */2]) + ")")), React.createElement("div", {
                                           className: "time"
                                         }, React.createElement("img", {
-                                              className: "heart",
+                                              className: "heartIcon",
                                               src: BitHeartPng
                                             }), "(" + (String(state[/* lives */3]) + ")")), React.createElement("div", {
                                           className: "score"

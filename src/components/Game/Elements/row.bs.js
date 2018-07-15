@@ -32,14 +32,39 @@ function mapRowType(x) {
 }
 
 function getRowNumber(cellNo) {
-  return String(Math.floor(cellNo / 24 | 0) | 0);
+  return Math.floor(cellNo / 24 | 0) | 0;
 }
 
 var randomiseTile = Random.init(4);
 
-function wrapRowClass(cellNo) {
-  var cellNo$1 = getRowNumber(cellNo);
-  var rowType = mapRowType(cellNo$1);
+function wrapRowClass(cellNo, lane) {
+  var rowNumber = getRowNumber(cellNo);
+  var rowType = mapRowType(String(rowNumber));
+  var cellModifier = [""];
+  if (cellNo === 6) {
+    cellModifier[0] = "stairs";
+  }
+  if (cellNo === 16) {
+    cellModifier[0] = "stairs";
+  }
+  if (lane === "1") {
+    if (cellNo === 2) {
+      cellModifier[0] = "blue-fountain";
+    }
+    
+  }
+  if (lane === "2") {
+    if (cellNo === 18) {
+      cellModifier[0] = "blue-fountain";
+    }
+    
+  }
+  if (lane === "3") {
+    if (cellNo === 10) {
+      cellModifier[0] = "blue-fountain";
+    }
+    
+  }
   var row;
   switch (rowType) {
     case 0 : 
@@ -53,10 +78,10 @@ function wrapRowClass(cellNo) {
         break;
     
   }
-  return "row-" + (String(row) + "");
+  return "row-" + (String(row) + (" " + (String(cellModifier) + "")));
 }
 
-function make(_, _$1) {
+function make(lane, _) {
   return /* record */[
           /* debugName */rowComponent[/* debugName */0],
           /* reactClassInternal */rowComponent[/* reactClassInternal */1],
@@ -83,7 +108,7 @@ function make(_, _$1) {
                                                     className: Cn.make(/* :: */[
                                                           "cell",
                                                           /* :: */[
-                                                            wrapRowClass(i),
+                                                            wrapRowClass(i, lane),
                                                             /* [] */0
                                                           ]
                                                         ])

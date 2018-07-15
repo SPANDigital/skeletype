@@ -5,6 +5,8 @@
 [@bs.val] external clearInterval : float => unit = "clearInterval";
 
 [@bs.module] external heartIcon : string = "../../assets/8-bit-heart.png";
+[@bs.module]
+external skeletonIcon : string = "../../assets/undead/undead_idle.gif";
 
 type lane =
   | Top
@@ -350,10 +352,11 @@ let make = _children => {
             </div>
             <div className="middle">
               <div className="killed">
-                (ReasonReact.string("Killed:" ++ string_of_int(killed)))
+                <img className="skeletonIcon" src=skeletonIcon />
+                (ReasonReact.string("(" ++ string_of_int(killed) ++ ")"))
               </div>
               <div className="time">
-                <img className="heart" src=heartIcon />
+                <img className="heartIcon" src=heartIcon />
                 (ReasonReact.string("(" ++ string_of_int(lives) ++ ")"))
               </div>
               <div className="score">
@@ -389,9 +392,9 @@ let make = _children => {
                 ),
               )
             )
-            <Row number="1" />
-            <Row number="2" />
-            <Row number="3" />
+            <Row lane="1" />
+            <Row lane="2" />
+            <Row lane="3" />
           </div>
           <div className="footer">
             <input

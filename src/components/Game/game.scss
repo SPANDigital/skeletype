@@ -71,7 +71,11 @@
         display: flex;
         justify-content: center;
         padding: 0 10px;
-        .heart {
+        .skeletonIcon {
+          margin-top: -8px;
+          height: 25px;
+        }
+        .heartIcon {
           height: 40px;
         }
         .killed,
@@ -178,15 +182,14 @@
   .footer {
     grid-area: f;
     input {
-      border: 2px #ffffff91;
       border-radius: 4px;
       font-size: 22px;
-      color: #f9f9f9;
+      color: #5dd07f;
       font-family: 'Press Start 2P', cursive;
       padding: 5px;
       text-align: center;
       background: rgba(0, 0, 0, 0.25);
-      border: 2px solid #ffffff;
+      border: 2px solid #5dd07f;
       &:focus {
         outline: none;
       }

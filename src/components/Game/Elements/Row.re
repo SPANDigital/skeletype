@@ -16,27 +16,53 @@ let mapRowType = x =>
   | "2" => Bottom
   };
 
-let getRowNumber = (~cellNo: int) : string =>
-  float_of_int(cellNo / _CELLS_PER_ROW)
-  |> floor
-  |> int_of_float
-  |> string_of_int;
+let getRowNumber = (~cellNo: int) : int =>
+  float_of_int(cellNo / _CELLS_PER_ROW) |> floor |> int_of_float;
 
 let randomiseTile = Random.init(4);
 
-let wrapRowClass = (~cellNo: int) => {
-  let cellNo: string = getRowNumber(cellNo);
-  let rowType = mapRowType(cellNo);
+let wrapRowClass = (~cellNo: int, ~lane: string) => {
+  let rowNumber = getRowNumber(cellNo);
+  let rowType = mapRowType(string_of_int(rowNumber));
+  let cellModifier = ref("");
+
+  /* Todo: do this programmatically and stop being lazy */
+  if (cellNo === 6) {
+    cellModifier := "stairs";
+  };
+
+  if (cellNo === 16) {
+    cellModifier := "stairs";
+  };
+
+  if (lane === "1") {
+    if (cellNo === 2) {
+      cellModifier := "blue-fountain";
+    };
+  };
+
+  if (lane === "2") {
+    if (cellNo === 18) {
+      cellModifier := "blue-fountain";
+    };
+  };
+
+  if (lane === "3") {
+    if (cellNo === 10) {
+      cellModifier := "blue-fountain";
+    };
+  };
+
   let row =
     switch (rowType) {
     | Top => "top"
     | Middle => "middle"
     | Bottom => "bottom"
     };
-  {j|row-$row|j};
+  {j|row-$row $cellModifier|j};
 };
 
-let make = (~number, _children) => {
+let make = (~lane, _children) => {
   ...rowComponent,
   render: self => {
     let totalCells = _ROWS_PER_GRID * _CELLS_PER_ROW;
@@ -57,7 +83,7 @@ let make = (~number, _children) => {
                 i =>
                   <div
                     key={j|row-$i|j}
-                    className=(Cn.make(["cell", wrapRowClass(i)]))
+                    className=(Cn.make(["cell", wrapRowClass(i, lane)]))
                   />,
                 cells,
               ),
