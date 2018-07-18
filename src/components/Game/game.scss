@@ -41,6 +41,7 @@
     }
     .youDied {
       display: flex;
+      flex-direction: column;
       position: absolute;
       top: 0;
       left: 0;
@@ -56,6 +57,11 @@
       opacity: 0;
       pointer-events: none;
       z-index: 1;
+      .finalScore {
+        color: white;
+        margin-top: 50px;
+        font-size: 30px;
+      }
       &.show {
         opacity: 1;
         pointer-events: all;

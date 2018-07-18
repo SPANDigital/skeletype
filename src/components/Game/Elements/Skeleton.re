@@ -27,14 +27,14 @@ let statusToString = (status: status) =>
   };
 
 let rowComponent = ReasonReact.statelessComponent("Skeleton");
-let make = (~time, ~startTime, ~stopTime, ~lane, ~status, _children) => {
+let make = (~time, ~startTime, ~stopTime, ~lane, ~status, ~speed, _children) => {
   ...rowComponent,
   render: self => {
     let progress = time - startTime;
     let divideByLength = (x: float) => x /. float_of_int(400);
     let percentageDone = progress |> float_of_int |> divideByLength;
 
-    let timeString = ref(string_of_int(progress * 2) ++ "px");
+    let timeString = ref(string_of_int(progress * speed) ++ "px");
     let determineGif = status =>
       switch (status) {
       | Walking => {j|url($gifWalking)|j}
@@ -57,7 +57,7 @@ let make = (~time, ~startTime, ~stopTime, ~lane, ~status, _children) => {
 
     /* Stop unit from moving */
     if (status === Dying || status === Dead || status === Attacking) {
-      timeString := string_of_int(stopTime * 2) ++ "px";
+      timeString := string_of_int(stopTime * speed) ++ "px";
     };
 
     <div

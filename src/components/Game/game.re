@@ -16,6 +16,7 @@ type state = {
   lives: int,
   input: string,
   countdown: int,
+  speed: int,
   words: array(word),
   skeletons: array(skeleton),
   intervalId: ref(option(float)),
@@ -58,6 +59,7 @@ let make = _children => {
       score: 0,
       killed: 0,
       lives: 10,
+      speed: 2,
       countdown: 1,
       input: "",
       skeletons: [||],
@@ -310,6 +312,13 @@ let make = _children => {
               Cn.make(["youDied", "show" |> Cn.ifTrue(state.lives <= 0)])
             )>
             (ReasonReact.string("YOU DIED"))
+            <div className="finalScore">
+              (
+                ReasonReact.string(
+                  "Final score: " ++ string_of_int(state.score),
+                )
+              )
+            </div>
           </div>
           <div className="header">
             <div className="beginning">
@@ -352,6 +361,7 @@ let make = _children => {
                       startTime=skeleton.startTime
                       stopTime=skeleton.stopTime
                       status=skeleton.status
+                      speed=state.speed
                       time
                     />,
                   skeletons,
