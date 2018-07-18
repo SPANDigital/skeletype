@@ -4,27 +4,10 @@
 [@bs.val] external setInterval : (unit => unit, int) => float = "setInterval";
 [@bs.val] external clearInterval : float => unit = "clearInterval";
 
-[@bs.module] external heartIcon : string = "../../assets/8-bit-heart.png";
-[@bs.module]
-external skeletonIcon : string = "../../assets/undead/undead_idle.gif";
+[@bs.module] external hi : string = "../../assets/8-bit-heart.png";
+[@bs.module] external si : string = "../../assets/undead/undead_idle.gif";
 
-type lane =
-  | Top
-  | Middle
-  | Bottom;
-
-type skeleton = {
-  startTime: int,
-  lane,
-  intervalId: ref(option(float)),
-  mutable stopTime: int,
-  mutable status: Skeleton.status,
-};
-
-type word = {
-  mutable randomWord: string,
-  wordLane: lane,
-};
+open Engine.Constructs;
 
 type state = {
   time: int,
@@ -38,13 +21,6 @@ type state = {
   intervalId: ref(option(float)),
   refTextField: ref(option(Dom.element)),
 };
-
-type gameState =
-  | Menu
-  | CountDown
-  | Playing
-  | Won
-  | Lost;
 
 type action =
   | Tick
@@ -62,25 +38,9 @@ type action =
   | RemoveSkeleton(lane)
   | SetSkeletonInterval(skeleton, option(float));
 
-let laneToInt = (lane: lane) =>
-  switch (lane) {
-  | Top => 1
-  | Middle => 2
-  | Bottom => 3
-  };
-
-let setSectionRef = (theRef, {ReasonReact.state}) =>
-  state.refTextField := Js.Nullable.toOption(theRef);
-
-let fillWords = () => {
-  let wordTop: word = {randomWord: "yo", wordLane: Top};
-  let wordMiddle: word = {randomWord: "hey", wordLane: Middle};
-  let wordBottom: word = {randomWord: "wow", wordLane: Bottom};
-  [|wordTop, wordMiddle, wordBottom|];
-};
-
 let gameComponent = ReasonReact.reducerComponent("Game");
 let make = _children => {
+  /* Event handlers */
   let click = (event, self) =>
     self.ReasonReact.send(KillSkeleton(self.state.time, Top));
   let handleType = (event, self) => {
@@ -89,6 +49,8 @@ let make = _children => {
                )##value;
     self.ReasonReact.send(ProcessInput(text));
   };
+  let setSectionRef = (theRef, {ReasonReact.state}) =>
+    state.refTextField := Js.Nullable.toOption(theRef);
   {
     ...gameComponent,
     initialState: () => {
@@ -99,7 +61,7 @@ let make = _children => {
       countdown: 1,
       input: "",
       skeletons: [||],
-      words: fillWords(),
+      words: Engine.Handlers.fillWords(),
       intervalId: ref(None),
       refTextField: ref(None),
     },
@@ -285,7 +247,7 @@ let make = _children => {
           (
             self => {
               let intervalId =
-                Some(setInterval(() => self.send(DamagePlayer), 1000));
+                Some(setInterval(() => self.send(DamagePlayer), 800));
               self.send(SetSkeletonInterval(skeleton, intervalId));
             }
           ),
@@ -338,6 +300,9 @@ let make = _children => {
                 "done" |> Cn.ifTrue(state.countdown <= 0),
               ])
             )>
+            <div className="instructions">
+              (ReasonReact.string("Kill the skeletons by...typing."))
+            </div>
             (ReasonReact.string(string_of_int(state.countdown)))
           </div>
           <div
@@ -348,15 +313,16 @@ let make = _children => {
           </div>
           <div className="header">
             <div className="beginning">
-              (ReasonReact.string("SKELETYPE"))
+              <span> (ReasonReact.string("SKELE")) </span>
+              <span className="green"> (ReasonReact.string("TYPE")) </span>
             </div>
             <div className="middle">
               <div className="killed">
-                <img className="skeletonIcon" src=skeletonIcon />
+                <img className="skeletonIcon" src=si />
                 (ReasonReact.string("(" ++ string_of_int(killed) ++ ")"))
               </div>
               <div className="time">
-                <img className="heartIcon" src=heartIcon />
+                <img className="heartIcon" src=hi />
                 (ReasonReact.string("(" ++ string_of_int(lives) ++ ")"))
               </div>
               <div className="score">
@@ -382,7 +348,7 @@ let make = _children => {
                   (i, skeleton) =>
                     <Skeleton
                       key={j|skeleton-$i|j}
-                      lane=(laneToInt(skeleton.lane))
+                      lane=(Engine.Handlers.laneToInt(skeleton.lane))
                       startTime=skeleton.startTime
                       stopTime=skeleton.stopTime
                       status=skeleton.status

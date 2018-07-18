@@ -1,7 +1,12 @@
 [@bs.module]
 external gifWalking : string = "../../../assets/undead/undead_walk.gif";
 [@bs.module]
-external gifDying : string = "../../../assets/undead/undead_death.gif";
+external gifDying0 : string = "../../../assets/undead/undead_death.gif";
+[@bs.module]
+external gifDying1 : string = "../../../assets/undead/undead_death_1.gif";
+[@bs.module]
+external gifDying2 : string = "../../../assets/undead/undead_death_2.gif";
+
 [@bs.module]
 external gifDead : string = "../../../assets/undead/undead_dead.gif";
 [@bs.module]
@@ -26,7 +31,7 @@ let make = (~time, ~startTime, ~stopTime, ~lane, ~status, _children) => {
   ...rowComponent,
   render: self => {
     let progress = time - startTime;
-    let divideByLength = (x: float) => x /. float_of_int(430);
+    let divideByLength = (x: float) => x /. float_of_int(400);
     let percentageDone = progress |> float_of_int |> divideByLength;
 
     let timeString = ref(string_of_int(progress * 2) ++ "px");
@@ -34,7 +39,12 @@ let make = (~time, ~startTime, ~stopTime, ~lane, ~status, _children) => {
       switch (status) {
       | Walking => {j|url($gifWalking)|j}
       | Attacking => {j|url($gifAttacking)|j}
-      | Dying => {j|url($gifDying)|j}
+      | Dying =>
+        switch (lane) {
+        | 1 => {j|url($gifDying0)|j}
+        | 2 => {j|url($gifDying1)|j}
+        | 3 => {j|url($gifDying2)|j}
+        }
       | Dead => {j|url($gifDead)|j}
       };
 

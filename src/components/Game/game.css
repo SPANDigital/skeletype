@@ -16,6 +16,7 @@
     z-index: 1; }
     .world .layout .countdown {
       display: flex;
+      flex-direction: column;
       position: absolute;
       top: 0;
       left: 0;
@@ -25,9 +26,13 @@
       z-index: 0;
       justify-content: center;
       align-items: center;
-      color: white;
-      font-size: 45px;
+      color: #5dd07f;
+      font-size: 65px;
       transition: 0.5s; }
+      .world .layout .countdown .instructions {
+        font-size: 25px;
+        margin-bottom: 100px;
+        color: white; }
       .world .layout .countdown.done {
         opacity: 0;
         pointer-events: none; }
@@ -61,6 +66,8 @@
       .world .layout .header .beginning {
         flex: 1;
         padding: 0 10px; }
+        .world .layout .header .beginning .green {
+          color: #5dd07f; }
       .world .layout .header .middle {
         flex: 3;
         display: flex;

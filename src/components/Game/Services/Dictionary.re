@@ -271,7 +271,6 @@ let words = [|
   "you're",
   "water",
   "Just",
-  "floating",
   "without",
   "any",
   "effort",
