@@ -57,7 +57,7 @@ let make = (~time, ~startTime, ~stopTime, ~lane, ~status, ~speed, _children) => 
 
     /* Stop unit from moving */
     if (status === Dying || status === Dead || status === Attacking) {
-      timeString := string_of_int(stopTime * speed) ++ "px";
+      timeString := (string_of_int(stopTime * speed) ++ "px");
     };
 
     <div

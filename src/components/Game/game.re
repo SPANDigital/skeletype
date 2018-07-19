@@ -18,6 +18,7 @@ type state = {
   countdown: int,
   speed: int,
   words: array(word),
+  takingDamage: bool,
   skeletons: array(skeleton),
   intervalId: ref(option(float)),
   refTextField: ref(option(Dom.element)),
@@ -29,6 +30,7 @@ type action =
   | Countdown
   | StartGame
   | DamagePlayer
+  | RemoveDamageFlag
   | ProcessInput(string)
   | AddWord(string, lane)
   | ReplaceWord(string, string)
@@ -62,6 +64,7 @@ let make = _children => {
       speed: 2,
       countdown: 1,
       input: "",
+      takingDamage: false,
       skeletons: [||],
       words: Engine.Handlers.fillWords(),
       intervalId: ref(None),
@@ -288,11 +291,30 @@ let make = _children => {
           Helpers.filter(~f=x => x.lane !== lane, state.skeletons);
         ReasonReact.Update({...state, skeletons: remainingSkeletons});
 
-      | DamagePlayer => ReasonReact.Update({...state, lives: state.lives - 1})
+      | DamagePlayer =>
+        ReasonReact.UpdateWithSideEffects(
+          {...state, lives: state.lives - 1, takingDamage: true},
+          (
+            self => {
+              setTimeout(() => self.send(RemoveDamageFlag), 400);
+              ();
+            }
+          ),
+        )
+      | RemoveDamageFlag =>
+        ReasonReact.Update({...state, takingDamage: false})
       },
     render: ({state, handle, send}) => {
       let {time, input, lives, skeletons, score, killed, words, _} = state;
       <div className="world">
+        <div
+          className=(
+            Cn.make([
+              "damage",
+              "taking" |> Cn.ifTrue(state.takingDamage === true),
+            ])
+          )
+        />
         <Fog />
         <div className="layout">
           <div
