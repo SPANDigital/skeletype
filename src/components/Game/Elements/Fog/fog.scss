@@ -1,9 +1,9 @@
 .fogwrapper {
     height: 100%;
-    position: absolute;
+    position: fixed;
     top: 0;
     width: 100%;
-    display: none;
+    display: block;
     #foglayer_01,
     #foglayer_02,
     #foglayer_03 {

@@ -62,7 +62,7 @@ let make = _children => {
       killed: 0,
       lives: 10,
       speed: 2,
-      countdown: 1,
+      countdown: 3,
       input: "",
       takingDamage: false,
       skeletons: [||],
